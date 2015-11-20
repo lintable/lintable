@@ -1,0 +1,10 @@
+# see http://nvie.com/posts/better-package-management/ for more details
+# put only the libraries we explicitly require
+# any dependencies will be determined by pip-compile
+#
+# 1) Get pip-compile by running: pip install pip-tools
+# 2) Run pip-compile with no arguments: pip-compile
+# 3) Run pip install off the generated requirements.txt: pip install -r requirements.txt
+#
+# You can use pip-sync to remove any unneeded packages after cleaning up the requirements.in
+Flask==0.10.1
