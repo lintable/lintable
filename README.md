@@ -2,10 +2,5 @@
 
 ## Development environments
 
-### Atom
-
-* Install the [editorconfig package](https://atom.io/packages/editorconfig).
-
-### PyCharm
-
-* Install the [EditorConfig plugin](https://plugins.jetbrains.com/plugin/7294).
+* **Atom:** Install the [editorconfig package](https://atom.io/packages/editorconfig).
+* **PyCharm:** Agree to the notification that pops up about EditorConfig settings.
