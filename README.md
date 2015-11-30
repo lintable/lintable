@@ -34,3 +34,8 @@ After any changes to `requirements.in`, run the activate script as noted in the 
 pip-compile requirements.in
 pip install -r requirements.txt --allow-all-external
 ```
+
+## Development environments
+
+* **Atom:** Install the [editorconfig package](https://atom.io/packages/editorconfig).
+* **PyCharm:** Agree to the notification that pops up about EditorConfig settings.
