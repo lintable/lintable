@@ -1,6 +1,13 @@
+import flask
 from flask import Flask, request
 
+from calc.entry import calc
+
 app = Flask(__name__)
+
+
+def __init(self):
+    super.__init__(self)
 
 
 @app.route('/')
@@ -18,7 +25,10 @@ def hi_there(person):
 def print_list():
     data = request.get_json()
     xs = data['list']
-    return 'The count was {count}'.format(count=len(xs))
+    result = calc.delay(xs)
+    response = result.wait()
+    return flask.jsonify(response)
+
 
 if __name__ == '__main__':
     app.run()
