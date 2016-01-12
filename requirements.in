@@ -9,4 +9,4 @@
 # You can use pip-sync to remove any unneeded packages after cleaning up the requirements.in
 Flask==0.10.1
 Gunicorn==19.4.1
-Celery==3.1
+Celery==3.1.19
