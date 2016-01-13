@@ -1,6 +1,4 @@
 ﻿#Capstone Team G
-##Code of Conduct
-
 
 ##A. Code of Conduct
 As a Project Team, we will:
@@ -66,8 +64,8 @@ We will:
 
 ##G. Team Meeting Guidelines:
 1. Team meetings will be held every week during scheduled class period (Mondays 6:40–9:30pm) after 11/9/15. Additional team meetings may be scheduled as needed.
-2. Additional Meetings will be called by the team lead or by any team member as needed. 
-3. Meetings will be posted to the shared Team G calendar, invitations  and meeting agendas should be attached and sent from this calendar. 
+2. Additional Meetings will be called by the team lead or by any team member as needed.
+3. Meetings will be posted to the shared Team G calendar, invitations  and meeting agendas should be attached and sent from this calendar.
 4. Meeting agendas will be created and distributed no later than 24 hours prior to a scheduled meeting.
 5. Meetings will be facilitated by the team lead or team member that calls the meeting.
 6. Meeting recaps will be sent to all attendees and team members within 48 hours of the meeting.
@@ -80,13 +78,17 @@ We will:
 4. Unresolved issues will be added to the Issues list.
 5. If a team member cannot attend a meeting, he/she will check the chat log, discussion board, other team members, etc. to determine what they missed
 6. Meeting tasks will be rotated among members.
- 
- 
- 
+
+
+
 ##I. Code Review Guidelines
 1. Team member makes a pull request
 2. Slack is notified automatically of the pending pull request
 3. First reviewer reviews the code and makes a +1 or thumbs up comment in Zube if the code passes review
 4. Second reviewer reviews the code and merges the pull request if the code passes review
 5. If nothing explodes, the second reviewer deletes the branch associated with the pull request
-This team contract/code of conduct is adapted from a sample contract provided for Fall 2015, CS 469 Capstone, Porland State University: http://www.sp.uconn.edu/~aja05001/Artino_Portfolio/products/EME6415_ComputerCourseware/Web-Based%20Tutorial%20Files/EME6635/Contract.htm
+
+
+
+*This team contract/code of conduct is adapted from a sample contract provided for
+Fall 2015, CS 469 Capstone, Porland State University:* [link to original](http://www.sp.uconn.edu/~aja05001/Artino_Portfolio/products/EME6415_ComputerCourseware/Web-Based%20Tutorial%20Files/EME6635/Contract.htm)
