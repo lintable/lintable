@@ -2,6 +2,7 @@
 
 ##A. Code of Conduct
 As a Project Team, we will:
+
 1. Only agree to do work that we are qualified for and capable of doing.
 2. Be honest and realistic in planning and reporting project scope, and schedule.
 3. Operate in a proactive manner, anticipating potential problems and working to prevent them before they happen.
@@ -13,6 +14,7 @@ As a Project Team, we will:
 
 ##B. Team Meeting Ground Rules: Participation
 We will:
+
 1. Be honest and open during meetings.
 2. Encourage a diversity of opinions on all topics.
 3. Give everyone the opportunity for equal participation.
@@ -22,6 +24,7 @@ We will:
 
 ##C. Team Meeting Ground Rules: Communication
 We will:
+
 1. Seek first to understand, and then to be understood.
 2. Be clear and to the point.
 3. Practice active, effective listening skills.
@@ -31,6 +34,7 @@ We will:
 
 ##D. Team Meeting Ground Rules: Problem Solving
 We will:
+
 1. Encourage everyone to participate.
 2. Encourage all ideas (no criticism), since new concepts come from outside of our normal perceptions.
 3. Build on each other's ideas.
@@ -41,6 +45,7 @@ We will:
 
 ##E. Team Meeting Ground Rules: Decision Making
 We will:
+
 1. Make decisions based on data whenever possible.
 2. Seek to find the needed information or data.
 3. Discuss criteria (cost, time, impact, etc.) for making a decision before choosing an option.
@@ -52,6 +57,7 @@ We will:
 
 ##F. Team Meeting Ground Rules: Handling Conflict
 We will:
+
 1. Regard conflict as normal and as an opportunity for growth.
 2. Seek to understand the interests and desires of each party involved before arriving at answers or solutions.
 3. Choose an appropriate time and place to explore the conflict.
