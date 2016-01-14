@@ -1,7 +1,8 @@
-from typing import List
+from logging import getLogger
+from typing import List, Dict
 
-from celery import group
-from celery.result import AsyncResult
+from celery import group, chord
+from celery.result import AsyncResult, GroupResult
 
 from uuid import UUID
 
@@ -11,36 +12,38 @@ from calc.sum import summation
 from calc.count import count
 from calc.avg import average
 
-submitted_tasks = {}
+logger = getLogger('entry')
 
 
-# yes this is absurd
-# its more about proof of concept than actually
-# coding something sensible
-# this should really send the results to a db
-# or some other form of persistent storage
-@runner.task
+@runner.task(serializer='json')
 def calc(xs: List[float]) -> UUID:
-    tasks = group([summation.s(xs), count.s(xs), average.s(xs)])
-    calculations = tasks.apply_async()
-    task_id = calculations.id
+    callback = collect_results.s()
+    tasks = [summation.s(xs),
+             count.s(xs),
+             average.s(xs)]
 
-    global submitted_tasks
-    submitted_tasks[task_id] = calculations
+    calculations = chord(tasks, callback).apply_async(
+            serializer='json')
+
+    task_id = calculations.id
 
     return dict(uuid=task_id)
 
 
+@runner.task(serializer='json')
+def collect_results(results: List[float]) -> Dict[str, float]:
+    logger.info('collect_results args: '.format(args=results))
+    return dict(sum=results[0], count=results[1], avg=results[2])
+
+
 def get_group_results(task_id: UUID):
-    global submitted_tasks
-    task = submitted_tasks[task_id]
+    logger.info('retrieving task id: $task_id'.format(task_id=task_id))
+    task = runner.AsyncResult(id=task_id)
 
     if task is None:
         return dict(msg='No such id')
     else:
-        return dict(sum=get_subtask_result(task.children[0]),
-                    count=get_subtask_result(task.children[1]),
-                    avg=get_subtask_result(task.children[2]))
+        return task.result
 
 
 def get_subtask_result(async_result: AsyncResult):
