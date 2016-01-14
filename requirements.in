@@ -10,3 +10,4 @@
 Flask==0.10.1
 Gunicorn==19.4.1
 Celery==3.1.19
+Redis==2.10.5
