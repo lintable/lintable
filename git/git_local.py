@@ -5,6 +5,7 @@ from typing import Dict, Iterable
 from uuid import UUID, uuid4
 
 from git import Repo
+from lintball.lint_report import LintReport
 
 join = os.path.join
 
@@ -44,6 +45,6 @@ def ab_files(path: str)-> Iterable(str, str, str):
     return []
 
 
-def process_results(repository: str, results):
+def process_results(repository: str, lint_report: LintReport):
     return None
 
