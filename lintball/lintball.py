@@ -3,8 +3,8 @@ from functools import partial
 from typing import List
 from uuid import uuid4, UUID
 
-from calc.runner import runner
 from git.github import github_pull_hook
+from lintball.runner import runner
 
 
 @runner.task(serializer='json')
