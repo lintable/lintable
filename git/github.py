@@ -1,7 +1,7 @@
 import os
 from functools import partial
 from logging import getLogger
-from typing import Dict
+from typing import Dict, Iterable
 from uuid import UUID, uuid4
 
 from git import Repo
@@ -46,8 +46,8 @@ def retrieve_files(uuid: UUID, owner: str, repository: str, pull_request_id: str
     return None
 
 
-def ab_files(path: str)-> (str, str, str):
-    return '', '', ''
+def ab_files(path: str)-> Iterable(str, str, str):
+    return []
 
 
 def process_results(repository: str, pull_request_id: str, comment_id: int):

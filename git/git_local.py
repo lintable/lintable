@@ -1,7 +1,7 @@
 import os
 from functools import partial
 from logging import getLogger
-from typing import Dict
+from typing import Dict, Iterable
 from uuid import UUID, uuid4
 
 from git import Repo
@@ -11,7 +11,7 @@ join = os.path.join
 local_repo = '$repo'
 local_path = './tmp/$uuid'
 
-logger = getLogger('GitHubIntegration')
+logger = getLogger('LocalGitIntegration')
 
 
 def git_local_repo(uuid: UUID, repo_path: str, branch: str = 'master', path: str = None)-> (partial, partial, partial):
@@ -40,8 +40,8 @@ def retrieve_files(uuid: UUID, repository: str, branch: str, path: str):
     return None
 
 
-def ab_files(path: str)-> (str, str, str):
-    return '', '', ''
+def ab_files(path: str)-> Iterable(str, str, str):
+    return []
 
 
 def process_results(repository: str, results):
