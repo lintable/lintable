@@ -81,6 +81,8 @@ venv/
 
 # Distribution / packaging
 .Python
+venv/
+venv
 env/
 build/
 develop-eggs/
