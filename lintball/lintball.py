@@ -8,7 +8,7 @@ from git.github import github_pull_hook
 from lintball.lint_error import LintError
 from lintball.lint_report import LintReport
 from lintball.runner import runner
-from linters import whitespace_linter
+from linters.whitespace_file_linter import WhitespaceFileLinter
 
 
 @runner.task(serializer='json')
@@ -36,4 +36,5 @@ def lintball(git: (partial, partial, partial), task_id: UUID):
 
 
 def lint(file: str)-> List[LintError]:
-    return whitespace_linter.lint_file(file)
+    linter = WhitespaceFileLinter()
+    return linter.lint_file(file)
