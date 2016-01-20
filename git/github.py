@@ -41,20 +41,21 @@ def github_pull_hook(uuid: UUID, payload: Dict)-> (partial, partial, partial):
     return partial_functions
 
 
-def github_oauth_response(payload: Dict)-> str:
+def github_oauth_response(payload: Dict, accountid: UUID)-> str:
     client_id = None
     client_secret = None
     code = payload['code']
     redirect_url = None
     state = payload['state']
+    #compare state to stored state in DB
     outgoing = {'client_id' : client_id,
-               'client_secret': client_secret,
-               'code': code,
-               'redirect_url': redirect_url,
-               'state': state}
+                'client_secret': client_secret,
+                'code': code,
+                'redirect_url': redirect_url,
+                'state': state}
     headers = {'Accept': 'application/json'}
 
-    request = requests.post('https://github.com/login/oauth/access_token', params=outgoing, header=headers)
+    request = requests.post('https://github.com/login/oauth/access_token', json=outgoing, header=headers)
     access_token = request.text['access_token']
     scope = request.text['scope']
     token_type = request.text['token_type']
