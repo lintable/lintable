@@ -1,3 +1,4 @@
+import json
 import os
 import requests
 from functools import partial
@@ -41,24 +42,24 @@ def github_pull_hook(uuid: UUID, payload: Dict)-> (partial, partial, partial):
     return partial_functions
 
 
-def github_oauth_response(payload: Dict, accountid: UUID)-> str:
-    client_id = None
-    client_secret = None
-    code = payload['code']
-    redirect_url = None
-    state = payload['state']
-    #compare state to stored state in DB
-    outgoing = {'client_id' : client_id,
-                'client_secret': client_secret,
+def github_oauth_response(code: str, state: str, accountid: UUID)-> str:
+    # TODO: Compare state to stored state in DB
+
+    # Construct outgoing data and a header
+    outgoing = {'client_id' : None,
+                'client_secret': None,
                 'code': code,
-                'redirect_url': redirect_url,
+                'redirect_url': None,
                 'state': state}
     headers = {'Accept': 'application/json'}
 
-    request = requests.post('https://github.com/login/oauth/access_token', json=outgoing, header=headers)
-    access_token = request.text['access_token']
-    scope = request.text['scope']
-    token_type = request.text['token_type']
+    # Post data to github and capture response then parse returned JSON
+    request = requests.post('https://github.com/login/oauth/access_token', data=outgoing, headers=headers)
+    payload = json.loads(request.text)
+    access_token = payload['access_token']
+    scope = payload['scope']
+
+    # TODO: Compare scopes to what we need
     return access_token
 
 
