@@ -1,31 +1,29 @@
 from typing import List
+
 import re
-
 from lintball.lint_error import LintError
-from lintball.lint_wrapper import BaseLintWrapper
+from lintball.lint_wrapper import LintWrapper
 
 """
-This linter is a special case of the lint wrapper where we are attempting to detect whitespace at the end of a line.
-Because we're not wrapping a linter provided by a third party it makes just as much sense to implement it directly in
-python as a subclass of the wrapper.
+The core MVP linter, attempting to detect whitespace on modified lines.
 """
 
 
-class WhitespaceFileLinter(BaseLintWrapper):
+class WhitespaceFileLinter(LintWrapper):
     ws_regex = re.compile("(\.)*(\s+)")
 
     # see this for the gory details, I'm going to cover the most probable
     # https://en.wikipedia.org/wiki/Newline
     # UNIX style line breaks, only a newline
     lf_regex = re.compile("(\.*)\n")
-    # Windows style line breaks, carraige return followed by a newline
+    # Windows style line breaks, carriage return followed by a newline
     cr_lf_regex = re.compile("(\.*)\r\n")
     # MacOS 9 and earlier
     cr_regex = re.compile("(\.*)\r")
 
     # TODO: Can this be reasonably replaced with re.compile(".*(\r|\n|\r\n)") ?
 
-    def lint_file(self, filename: str, optional_parameters: List[str] = None)-> List[LintError]:
+    def lint(self, filename: str) -> List[LintError]:
         total_matches = []
 
         # TODO: Open the file, read contents, split that instead of the filename.
@@ -39,7 +37,7 @@ class WhitespaceFileLinter(BaseLintWrapper):
 
         return total_matches
 
-    def has_trailing_whitespace(self, line_number: int, line: str)-> List[LintError]:
+    def has_trailing_whitespace(self, line_number: int, line: str) -> List[LintError]:
         split = self.ws_regex.split(line)
 
         if len(split) > 1:
