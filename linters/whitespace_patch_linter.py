@@ -1,5 +1,4 @@
 from typing import List
-import re
 
 from lintball.lint_error import LintError
 from linters.whitespace_file_linter import WhitespaceFileLinter
@@ -14,13 +13,12 @@ This linter expects to operate on a patch file calculated by the "diff" command 
 
 
 class WhitespacePatchLinter(WhitespaceFileLinter):
-    def lint_file(self, filename: str, optional_parameters: List[str] = None) -> List[LintError]:
+    def lint(self, filename: str) -> List[LintError]:
         total_matches = []
 
-        lines = [None] # TODO: Open the file and diff it python diff library. Do the thing.
+        lines = [None]  # TODO: Open the file and diff it python diff library. Do the thing.
         for line_number, line in lines:
             assert isinstance(line, str)
             total_matches.append(self.has_trailing_whitespace(line_number, line))
 
         return total_matches
-
