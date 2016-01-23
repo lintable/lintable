@@ -10,7 +10,7 @@ The core MVP linter, attempting to detect whitespace on modified lines.
 
 
 class WhitespaceFileLinter(LintWrapper):
-    ws_regex = re.compile("(\.)*(\s+)")
+    ws_regex = re.compile("^(.+?)(\s+)$")
 
     # see this for the gory details, I'm going to cover the most probable
     # https://en.wikipedia.org/wiki/Newline
@@ -32,17 +32,19 @@ class WhitespaceFileLinter(LintWrapper):
         line_number = 1
 
         for line in lines:
-            total_matches.append(self.has_trailing_whitespace(line_number, line))
+            lint_error = self.has_trailing_whitespace(line_number, line)
+            if lint_error is not None:
+                total_matches.append(lint_error)
             line_number += 1
 
         return total_matches
 
     def has_trailing_whitespace(self, line_number: int, line: str) -> List[LintError]:
-        split = self.ws_regex.split(line)
+        match = self.ws_regex.match(line)
 
-        if len(split) > 1:
-            return [LintError(line_number=line_number,
-                              column=len(split[0]),
-                              msg='Found trailing whitespace \'$ws\''.format(ws=split[-2]))]
+        if match:
+            return LintError(line_number=line_number,
+                              column=match.start(2) + 1,
+                              msg="Found trailing whitespace: '{}'".format(match.group(1)))
         else:
-            return []
+            return None
