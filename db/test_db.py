@@ -12,6 +12,14 @@ logging.basicConfig(filename='./db_tests.log', level=logging.DEBUG)
 
 
 class dbTests(unittest.TestCase):
+    def setUp(self):
+        db.User._meta.database = test_db
+        db.Jobs._meta.database = test_db
+        db.Repo._meta.database = test_db
+
+        for i in [db.User, db.Jobs, db.Repo]:
+            if not i.table_exists():
+                test_db.create_table(i)
     def test_shouldHaveUser(self):
         with test_database(test_db, (db.User)):
             self.assertIsNotNone(db.User())
