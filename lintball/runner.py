@@ -3,10 +3,11 @@ from __future__ import absolute_import
 import logging
 
 from celery import Celery
+from settings.settings import LINTBALL_SETTINGS
 
 runner = Celery('runner',
-                broker='amqp://',
-                backend='redis://',
+                broker=LINTBALL_SETTINGS['celery']['broker'],
+                backend=LINTBALL_SETTINGS['celery']['backend'],
                 include=['git.lint_github',
                          'git.lint_git_local'])
 
