@@ -5,7 +5,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 database = PostgresqlDatabase(
     'db_name',
     user='user_name',
@@ -20,8 +19,6 @@ class BaseModel(Model):
             database = database
         except Exception as e:
             logger.error("Unable to connect.\nException: {0}".format(e))
-
-
 
 
 class User(BaseModel):
@@ -46,10 +43,13 @@ class Jobs(BaseModel):
     status = CharField()
 
 
-"""Returns a user object matching the supplied user name."""
-
-
 def get_user(username: str) -> User:
+    """
+    Finds a user for a given user name
+
+    :param username:
+    :return User or None:
+    """
     try:
         user = User.get(User.username == username)
     except User.DoesNotExist as e:
@@ -64,10 +64,13 @@ def get_user(username: str) -> User:
     return user
 
 
-"""Returns a repo object matching the supplied URL."""
-
-
 def get_repo(url: str) -> Repo:
+    """
+    Finds a repo for a given URL
+
+    :param url:
+    :return Repo or None:
+    """
     try:
         repo = Repo.get(Repo.url == url)
     except Repo.DoesNotExist as e:
@@ -81,6 +84,12 @@ def get_repo(url: str) -> Repo:
 
 
 def get_jobs_for_user(username: str) -> Iterable[Jobs]:
+    """
+    Finds any jobs currently in the system for a given user name.
+
+    :param username:
+    :return Iterable object of Jobs or None:
+    """
     try:
         jobs = SelectQuery(Jobs).join(User).where(User.id == Jobs.id,
                                                   User.username == username)
@@ -92,10 +101,14 @@ def get_jobs_for_user(username: str) -> Iterable[Jobs]:
     return jobs
 
 
-"""Updates job status and returns number of records changed. """
-
-
 def set_job_status(job_id: int, status: str) -> int:
+    """
+    Updates job status to provided string.
+
+    :param job_id:
+    :param status:
+    :return number of records changed or None:
+    """
     try:
         job = Jobs.get(Jobs.id == job_id)
         job.status = status
