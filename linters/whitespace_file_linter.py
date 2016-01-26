@@ -10,7 +10,7 @@ The core MVP linter, attempting to detect whitespace on modified lines.
 
 
 class WhitespaceFileLinter(LintWrapper):
-    ws_regex = re.compile("^(.+?)(\s+)$")
+    ws_regex = re.compile("^(.*?)(\s+)$")
 
     # see this for the gory details, I'm going to cover the most probable
     # https://en.wikipedia.org/wiki/Newline
