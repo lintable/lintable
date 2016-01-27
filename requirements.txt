@@ -16,6 +16,8 @@ itsdangerous==0.24        # via flask
 jinja2==2.8               # via flask
 kombu==3.0.33             # via celery
 markupsafe==0.23          # via jinja2
+peewee==2.8.0
+psycopg2==2.6.1
 pytz==2015.7              # via celery
 Redis==2.10.5
 Requests==2.9.1

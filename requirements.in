@@ -12,5 +12,6 @@ Gunicorn==19.4.1
 Celery==3.1.19
 Redis==2.10.5
 GitPython==1.0.1
+peewee==2.8.0
+psycopg2==2.6.1
 Requests==2.9.1
-

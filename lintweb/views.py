@@ -67,11 +67,11 @@ def github_oauth(accountid=None):
     # Gather data to send to Github
     callback_url = 'https://www.lintable.com/oauth/callback/' + str(accountid)
     url = 'https://github.com/login/oauth/authorize'
-    state = uuid4()
-    params = {'client_id' : None,
-              'redirect_uri' : callback_url,
-              'scope' : None,
-              'state' : str(state)}
+    params = {
+        'client_id' : None,
+        'redirect_uri' : callback_url,
+        'scope' : None
+    }
 
     # Build query srting and attach to URL
     params = urllib.parse.urlencode(params)
