@@ -38,6 +38,9 @@ class WhitespaceFileLinter(LintWrapper):
 
     # TODO: Can this be reasonably replaced with re.compile(".*(\r|\n|\r\n)") ?
 
+    def __repr__(self):
+        return 'Whitespace Linter'
+
     def lint(self, filename: str) -> List[LintError]:
         total_matches = []
 
