@@ -16,7 +16,7 @@ Settings dictionary for lintball.
 
 LINTBALL_SETTINGS = {
     'celery': {
-        'BROKER': os.environ.get('CELERY_BROKER', 'amqp://'),
-        'BACKEND': os.environ.get('CELERY_BACKEND', 'redis://')
+        'broker': os.environ.get('CELERY_BROKER', 'amqp://'),
+        'backend': os.environ.get('CELERY_BACKEND', 'redis://')
     }
 }
