@@ -3,12 +3,13 @@ from uuid import UUID
 from git import Commit
 
 from lintball.lint_report import LintReport
+from process_handler.do_nothing_handler import DoNothingHandler
 from process_handler.process_state import ProcessState
 
 
 class ProcessHandler(object):
-
-    def __init__(self, uuid: UUID, repo: str, logger, commenter, db):
+    def __init__(self, uuid: UUID, repo: str, logger=DoNothingHandler(),
+                 commenter=DoNothingHandler(), db=DoNothingHandler()):
         self.state = ProcessState.STARTED
         self.uuid = uuid
         self.repo = repo
@@ -19,9 +20,9 @@ class ProcessHandler(object):
         self.b_commit = None[str]
         self.path = None[str]
         self.files = []
-        self.comment_id = self.commenter.started(uuid)
-        self.logger.started(uuid, self.comment_id)
-        self.db.started(self.uuid, self.comment_id)
+        self.comment_id = self.commenter.started(uuid=self.uuid)
+        self.logger.started(uuid=self.uuid, comment_id=self.comment_id)
+        self.db.started(uuid=self.uuid, comment_id=self.comment_id)
 
     def clone_repo(self, local_path: str):
         self.state = ProcessState.CLONE_REPO
