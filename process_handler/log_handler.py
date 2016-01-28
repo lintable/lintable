@@ -17,8 +17,8 @@ class LogHandler(DoNothingHandler):
         super().lint_file(linter, file)
         self.logger.info('Linting {file} with linter {linter}'.format(file=file, linter=linter))
 
-    def retrieve_files(self, a_commit: str, b_commit: str):
-        super().retrieve_files(a_commit, b_commit)
+    def retrieve_changed_file_set(self, a_commit: str, b_commit: str):
+        super().retrieve_changed_file_set(a_commit, b_commit)
         self.logger.info('Retrieving files from {a_commit} and {b_commit}'.format(a_commit=a_commit, b_commit=b_commit))
 
     def report(self, report: LintReport):
@@ -46,6 +46,6 @@ class LogHandler(DoNothingHandler):
         super().clone_repo(uuid, repo, local_path)
         self.logger.info('Cloning repo {repo}'.format(repo=str(repo)))
 
-    def retrieve_file(self, file: str, commit: str):
-        super().retrieve_file(file, commit)
+    def retrieve_file_from_commit(self, file: str, commit: str):
+        super().retrieve_file_from_commit(file, commit)
         self.logger.info('Retrieving {file} from {commit}'.format(file=file, commit=commit))

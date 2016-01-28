@@ -21,15 +21,19 @@ class GitHandler(object):
         self.repo = None[str]
         self.files = []
         self.branch = branch
-        self.publisher = handler
+        self.handler = handler
         self.uuid = handler.uuid
         self.last_merge = None[Repo]
         self.previous_commit = None[Repo]
         self.local_path = temp_path.format(self.uuid)
         return
 
+    def started(self):
+        self.handler.started()
+        return
+
     def clone_repo(self):
-        self.publisher.clone_repo(self.local_path)
+        self.handler.clone_repo(self.local_path)
         self.repo = Repo(path=self.repo_url)
         self.repo.clone(path=join(self.local_path, 'repo'))
         self.last_merge = self.get_last_merge()
@@ -38,8 +42,8 @@ class GitHandler(object):
         return
 
     def retrieve_files(self):
-        self.publisher.retrieve_files(str(self.last_merge),
-                                      str(self.previous_commit))
+        self.handler.retrieve_changed_file_set(self.last_merge,
+                                               self.previous_commit)
         os.mkdir(join(self.local_path, 'a'))
         os.mkdir(join(self.local_path, 'b'))
         a_files = list(self.last_merge.stats.files.keys())
@@ -59,7 +63,7 @@ class GitHandler(object):
                 '{sha1}:{filename}'.format(sha1=commit.hexsha,
                                            filename=filename))
             file = join(path, filename)
-            self.publisher.retrieve_file(filename, commit)
+            self.handler.retrieve_file_from_commit(filename, commit)
             dir_path = os.path.dirname(filename)
 
             if dir_path and not os.path.exists(join(path, dir_path)):
@@ -74,4 +78,3 @@ class GitHandler(object):
         last_merge = self.repo.git.log('--merges', n=1, format='%H')
 
         return self.repo.commit(last_merge)
-

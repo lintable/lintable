@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from git import Repo
+from git import Commit, Repo
 from lintball.lint_report import LintReport
 
 
@@ -15,17 +15,17 @@ class DoNothingHandler(object):
     def clone_repo(self, uuid: UUID, repo: Repo, local_path: str):
         return
 
-    def retrieve_files(self, uuid: UUID, a_commit: str, b_commit: str):
+    def retrieve_changed_file_set(self, uuid: UUID, a_commit: Commit, b_commit: Commit):
         return
 
-    def retrieve_file(self, file: str, commit: str):
+    def retrieve_file_from_commit(self, uuid: UUID, file: str, commit: Commit):
         return
 
-    def lint_file(self, linter: str, file: str):
+    def lint_file(self, uuid: UUID, linter: str, file: str):
         return
 
-    def report(self, report: LintReport):
+    def report(self, uuid: UUID, report: LintReport):
         return
 
-    def finish(self):
+    def finish(self, uuid: UUID):
         return
