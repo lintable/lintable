@@ -18,14 +18,14 @@ class GitHandler(object):
     def __init__(self, handler: ProcessHandler, repo_url: str,
                  branch: str = 'master'):
         self.repo_url = repo_url
-        self.repo = None[str]
+        self.repo = None
         self.files = []
         self.branch = branch
         self.handler = handler
         self.uuid = handler.uuid
-        self.last_merge = None[Repo]
-        self.previous_commit = None[Repo]
-        self.local_path = temp_path.format(self.uuid)
+        self.last_merge = None
+        self.previous_commit = None
+        self.local_path = temp_path.format(uuid=self.uuid)
         return
 
     def started(self):

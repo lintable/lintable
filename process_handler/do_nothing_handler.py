@@ -9,7 +9,7 @@ class DoNothingHandler(object):
     def __init__(self):
         pass
 
-    def started(self, uuid: UUID, comment_id: int = None[int]):
+    def started(self, uuid: UUID, comment_id: int = None):
         return
 
     def clone_repo(self, uuid: UUID, repo: Repo, local_path: str):

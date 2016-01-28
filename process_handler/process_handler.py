@@ -18,11 +18,11 @@ class ProcessHandler(object):
         self.logger = logger
         self.commenter = commenter
         self.db = db
-        self.a_commit = None[str]
-        self.b_commit = None[str]
-        self.local_path = None[str]
+        self.a_commit = None
+        self.b_commit = None
+        self.local_path = None
         self.files = []
-        self.comment_id = None[int]
+        self.comment_id = None
 
     def started(self):
         self.comment_id = self.commenter.started(uuid=self.uuid)
