@@ -1,10 +1,8 @@
 import json
 import logging
 import os
-from typing import List, Dict
-from uuid import uuid4, UUID
-
-from functools import partial
+from typing import List
+from uuid import uuid4
 
 from git_handler.git_handler import GitHandler
 from lintball.lint_error import LintError
@@ -19,30 +17,32 @@ from process_handler.process_handler import ProcessHandler
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):
     repo_url = 'ssh://git@github.com:{full_name}.git'.format(
-        payload['repo']['full_name'])
+        full_name=payload['repo']['full_name'])
 
     handler = ProcessHandler(repo=repo_url, uuid=task_id,
                              logger=LogHandler(logging.getLogger()))
 
     git_handler = GitHandler(handler=handler, repo_url=repo_url)
 
-    lintball(git_handler, handler, [WhitespaceFileLinter()])
-
-    return
-
-
-def lintball(git_handler: GitHandler, handler: ProcessHandler,
-             linters: List[LintWrapper]):
     git_handler.clone_repo()
 
     git_handler.retrieve_files()
 
-    a_path = os.path.join(git_handler.local_path, 'a')
-    b_path = os.path.join(git_handler.local_path, 'b')
+    linters = [WhitespaceFileLinter()]
+
+    lintball(handler, linters)
+
+    return
+
+
+def lintball(handler: ProcessHandler,
+             linters: List[LintWrapper]):
+    a_path = os.path.join(handler.local_path, 'a')
+    b_path = os.path.join(handler.local_path, 'b')
 
     lint_errors = {}
 
-    for filename in git_handler.files():
+    for filename in handler.files():
         a_file = os.path.join(a_path, filename)
         b_file = os.path.join(b_path, filename)
 
