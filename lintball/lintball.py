@@ -19,30 +19,41 @@ def lint_github(payload: json, task_id=uuid4()):
     repo_url = 'ssh://git@github.com:{full_name}.git'.format(
         full_name=payload['repo']['full_name'])
 
-    handler = ProcessHandler(repo=repo_url, uuid=task_id,
-                             logger=LogHandler(logging.getLogger()))
+    process_handler = ProcessHandler(repo=repo_url, uuid=task_id,
+                                     logger=LogHandler(logging.getLogger()))
 
-    git_handler = GitHandler(handler=handler, repo_url=repo_url)
+    git_handler = GitHandler(handler=process_handler, repo_url=repo_url)
+
+    lint_process(git_handler, process_handler)
+
+    return
+
+
+def lint_process(git_handler: GitHandler,
+                 process_handler: ProcessHandler,
+                 linters=None):
+
+    if linters is None:
+        linters = [WhitespaceFileLinter()]
+
+    git_handler.started()
 
     git_handler.clone_repo()
 
     git_handler.retrieve_files()
 
-    linters = [WhitespaceFileLinter()]
-
-    lintball(handler, linters)
+    lintball(process_handler, linters)
 
     return
 
 
-def lintball(handler: ProcessHandler,
-             linters: List[LintWrapper]):
+def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
     a_path = os.path.join(handler.local_path, 'a')
     b_path = os.path.join(handler.local_path, 'b')
 
     lint_errors = {}
 
-    for filename in handler.files():
+    for filename in handler.files:
         a_file = os.path.join(a_path, filename)
         b_file = os.path.join(b_path, filename)
 
@@ -62,13 +73,11 @@ def lintball(handler: ProcessHandler,
     return
 
 
-def lint(filename: str, linters: List[LintWrapper], handler: ProcessHandler) \
-    -> \
-        List[LintError]:
+def lint(filename: str, linters: List[LintWrapper], handler: ProcessHandler) -> List[LintError]:
     lint_errors = []
 
     for linter in linters:
         handler.lint_file(linter=str(linter), file=filename)
-        lint_errors.append(linter.lint(filename))
+        lint_errors.extend(linter.lint(filename))
 
     return lint_errors
