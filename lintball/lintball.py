@@ -22,7 +22,7 @@ def lint_github(payload: json, task_id=uuid4()):
     process_handler = ProcessHandler(repo=repo_url, uuid=task_id,
                                      logger=LogHandler(logging.getLogger()))
 
-    git_handler = GitHandler(handler=process_handler, repo_url=repo_url)
+    git_handler = GitHandler(process_handler=process_handler, repo_url=repo_url)
 
     lint_process(git_handler, process_handler)
 
@@ -40,7 +40,7 @@ def lint_process(git_handler: GitHandler,
 
     git_handler.clone_repo()
 
-    git_handler.retrieve_files()
+    git_handler.retrieve_changed_files_from_commit()
 
     lintball(process_handler, linters)
 
