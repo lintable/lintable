@@ -14,3 +14,4 @@ Redis==2.10.5
 GitPython==1.0.1
 peewee==2.8.0
 psycopg2==2.6.1
+simple-crypt==4.1.7
