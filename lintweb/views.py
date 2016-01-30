@@ -1,8 +1,21 @@
+#Copyright 2015-2016 Capstone Team G
+#
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
 """Supply the frontend pages."""
 
 from flask import request, render_template, redirect
 from lintweb import app
-from uuid import uuid4
 from git import github
 from settings.settings import LINTWEB_SETTINGS
 import urllib.parse
@@ -19,11 +32,6 @@ def index():
 def account(accountid=None):
     """View details for an existing user account."""
     return render_template('account.html', accountid=accountid)
-
-@app.route('/register')
-def register():
-    """Register a new user account."""
-    return render_template('register.html')
 
 @app.route('/login')
 def login():
@@ -66,7 +74,7 @@ def github_payload():
 
 @app.route('/register')
 def github_oauth():
-    # Gather data to send to Github
+    """Redirect user to github OAuth registeration page."""
     url = LINTWEB_SETTINGS['github']['OAUTH_URL']
     params = {
         'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
@@ -74,15 +82,15 @@ def github_oauth():
         'scope' : LINTWEB_SETTINGS['github']['SCOPES']
     }
 
-    # Build query string and attach to URL
     params = urllib.parse.urlencode(params)
     url = '{}?{}'.format(url, params)
 
     return redirect(url, code=302)
 
 
-@app.route('/oauth/callback')
+@app.route('/callback')
 def github_oauth_response():
+    """Receive OAuth code and retrieve token"""
     code = request.args.get('code')
     access_token = github.github_oauth_response(code=code)
 
@@ -92,5 +100,5 @@ def github_oauth_response():
     user = Github(access_token).get_user()
     github_user_id = user.id
 
-    # TODO: Store access token under accountid
+    # TODO: Store access_token under user_id
     return 'Your Oauth token is: {} and your github id is: {}'.format(access_token, github_user_id)
