@@ -10,6 +10,14 @@ LINTWEB_SETTINGS = {
         'PORT': os.environ.get('LINTWEB_DB_PORT', '1234'),
         'USER': os.environ.get('LINTWEB_DB_USER', ''),
         'PASS': os.environ.get("LINTWEB_DB_PASS", '')
+    },
+    'github': {
+        'CLIENT_ID': os.environ.get('LINTWEB_CLIENT_ID', ''),
+        'CLIENT_SECRET': os.environ.get('LINTWEB_CLIENT_SECRET', ''),
+        'CALLBACK': os.environ.get('LINTWEB_FLASK_CALLBACK', 'localhost/callback'),
+        'OAUTH_URL': os.environ.get('LINTWEB_OAUTH_URL', 'https://github.com/login/oauth/authorize'),
+        'OAUTH_URL_POST': os.environ.get('LINTWEB_OAUTH_URL_POST', 'https://github.com/login/oauth/access_token'),
+        'SCOPES': os.environ.get('LINTWEB_SCOPES', 'repo:status')
     }
 }
 

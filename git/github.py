@@ -5,6 +5,7 @@ from functools import partial
 from logging import getLogger
 from typing import Dict, Iterable
 from uuid import UUID, uuid4
+from settings.settings import LINTWEB_SETTINGS
 
 from git import Repo
 from lintball.lint_report import LintReport
@@ -42,24 +43,28 @@ def github_pull_hook(uuid: UUID, payload: Dict)-> (partial, partial, partial):
     return partial_functions
 
 
-def github_oauth_response(code: str, state: str, accountid: UUID)-> str:
-    # TODO: Compare state to stored state in DB
+def github_oauth_response(code: str)-> str:
+    url = LINTWEB_SETTINGS['github']['OAUTH_URL_POST']
 
     # Construct outgoing data and a header
-    outgoing = {'client_id' : None,
-                'client_secret': None,
-                'code': code,
-                'redirect_url': None,
-                'state': state}
+    outgoing = {
+        'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+        'client_secret': LINTWEB_SETTINGS['github']['CLIENT_SECRET'],
+        'code': code,
+        'redirect_url': LINTWEB_SETTINGS['flask']['CALLBACK']
+    }
     headers = {'Accept': 'application/json'}
 
     # Post data to github and capture response then parse returned JSON
-    request = requests.post('https://github.com/login/oauth/access_token', data=outgoing, headers=headers)
+    request = requests.post(url, data=outgoing, headers=headers)
     payload = json.loads(request.text)
     access_token = payload['access_token']
-    scope = payload['scope']
+    scope_given = payload['scope'].split(',')
 
-    # TODO: Compare scopes to what we need
+    scope_needed = LINTWEB_SETTINGS['github']['SCOPE'].split(',')
+    for perm in scope_needed:
+        if perm not in scope_given:
+            return None
     return access_token
 
 

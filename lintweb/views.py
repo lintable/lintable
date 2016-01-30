@@ -4,7 +4,9 @@ from flask import request, render_template, redirect
 from lintweb import app
 from uuid import uuid4
 from git import github
+from settings.settings import LINTWEB_SETTINGS
 import urllib.parse
+from github import Github
 # from lintball.lintball import lint_github
 
 @app.route('/')
@@ -62,30 +64,33 @@ def github_payload():
     return
 
 
-@app.route('/oauth/<accountid>')
-def github_oauth(accountid=None):
+@app.route('/register')
+def github_oauth():
     # Gather data to send to Github
-    callback_url = 'https://www.lintable.com/oauth/callback/' + str(accountid)
-    url = 'https://github.com/login/oauth/authorize'
+    url = LINTWEB_SETTINGS['github']['OAUTH_URL']
     params = {
-        'client_id' : None,
-        'redirect_uri' : callback_url,
-        'scope' : None
+        'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+        'redirect_uri' : LINTWEB_SETTINGS['github']['CALLBACK'],
+        'scope' : LINTWEB_SETTINGS['github']['SCOPES']
     }
 
-    # Build query srting and attach to URL
+    # Build query string and attach to URL
     params = urllib.parse.urlencode(params)
     url = '{}?{}'.format(url, params)
 
-    # TODO: Store uuid in DB under accountid
     return redirect(url, code=302)
 
 
-@app.route('/oauth/callback/<accountid>')
-def github_oauth_response(accountid=None):
+@app.route('/oauth/callback')
+def github_oauth_response():
     code = request.args.get('code')
-    state = request.args.get('state')
-    access_token = github.github_oauth_response(code=code, state=state, accountid=accountid)
+    access_token = github.github_oauth_response(code=code)
+
+    if access_token == None:
+        return 'You did not accept our permissions.'
+
+    user = Github(access_token).get_user()
+    github_user_id = user.id
 
     # TODO: Store access token under accountid
-    return 'Your Oauth token is: {}'.format(access_token)
+    return 'Your Oauth token is: {} and your github id is: {}'.format(access_token, github_user_id)
