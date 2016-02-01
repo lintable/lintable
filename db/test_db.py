@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This is needed to set env vars before execution, needs to be first import
+from db.local_test_settings import *
 import unittest
 import logging
 from db.database import database_handler
@@ -60,7 +62,7 @@ class dbTests(unittest.TestCase):
             person = User(username='new_user', token='dummyToken',
                           github_id='badId')
             person.save()
-            self.assertTrue(self.db.get_user('new_user').token == 'dummyToken')
+            self.assertTrue(self.db.get_user('new_user').get_oauth_token() == 'dummyToken')
 
             # cleanup
             self.assertTrue(person.delete_instance() == 1)
