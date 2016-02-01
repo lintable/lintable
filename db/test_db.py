@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import unittest
-
-from db.database import database_handler
-from db.models import User,Repo,Jobs
 import logging
+from db.database import database_handler
+from db.models import User, Repo, Jobs
 from peewee import *
 from playhouse.test_utils import test_database
 
@@ -38,19 +37,19 @@ class dbTests(unittest.TestCase):
                 test_db.create_table(i)
 
     def test_shouldHaveUser(self):
-        with test_database(test_db, (User)):
+        with test_database(test_db, ()):
             self.assertIsNotNone(User())
 
     def test_shouldHaveJob(self):
-        with test_database(test_db, (User)):
+        with test_database(test_db, ()):
             self.assertIsNotNone(Jobs())
 
     def test_shouldHaveRepo(self):
-        with test_database(test_db, (User)):
+        with test_database(test_db, ()):
             self.assertIsNotNone(Repo())
 
     def test_returns_none_for_missing_user(self):
-        with test_database(test_db, (User)):
+        with test_database(test_db, ()):
             self.assertIsNone(self.db.get_user(''))
 
     def test_sucessfully_adds_user(self):
@@ -58,7 +57,8 @@ class dbTests(unittest.TestCase):
             self.assertIsNone(self.db.get_user('new_user'))
 
             # exercise
-            person = User(username='new_user', token='dummyToken', github_id='badId')
+            person = User(username='new_user', token='dummyToken',
+                          github_id='badId')
             person.save()
             self.assertTrue(self.db.get_user('new_user').token == 'dummyToken')
 
@@ -70,8 +70,10 @@ class dbTests(unittest.TestCase):
             # SUT
             self.assertIsNotNone('user_1')
             self.assertIsNotNone('user_2')
-            user_1 = User(username='user_1', token='dummyToken',github_id='badId')
-            user_2 = User(username='user_2', token='dummyToken2',github_id='badId2')
+            user_1 = User(username='user_1', token='dummyToken',
+                          github_id='badId')
+            user_2 = User(username='user_2', token='dummyToken2',
+                          github_id='badId2')
             user_2.save()
             user_1.save()
 

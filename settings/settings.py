@@ -23,7 +23,8 @@ LINTWEB_SETTINGS = {
         'DATABASE_URL': os.environ.get('DATABASE_URL', 'postgres://user@localhost:5432/postgres')
     },
     'simple-crypt': {
-        'ENCRYPTION_KEY': os.environ.get('ENCYPTION_KEY', None)
+        'ENCRYPTION_KEY': os.environ.get('ENCRYPTION_KEY', None)
+
     }
 }
 

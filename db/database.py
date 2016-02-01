@@ -16,9 +16,7 @@ from peewee import *
 from peewee import SelectQuery
 from typing import Iterable
 import logging
-from db.models import User
-from db.models import Repo
-from db.models import Jobs
+from db.models import User, Repo,Jobs
 logger = logging.getLogger(__name__)
 
 class database_handler():
@@ -40,8 +38,8 @@ class database_handler():
             logger.error(e)
         return repo
 
-
-    def get_user(self, username: str) -> User:
+    @staticmethod
+    def get_user(username: str) -> User:
         """
         Finds a user for a given user name
 

@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from peewee import *
 import logging
+from db.fields import OauthField
+import db.database
 from settings.settings import LINTWEB_SETTINGS
 from urllib.parse import urlparse
-from simplecrypt import encrypt, decrypt
+from simplecrypt import decrypt, encrypt
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,12 @@ class BaseModel(Model):
             logger.error("Unable to connect.\nException: {0}".format(e))
 
 
+
 class User(BaseModel):
     id = PrimaryKeyField(primary_key='true')
-    username = CharField(unique='true', null=True)
+    username = CharField(unique='true', null='True')
     github_id = CharField(unique='true')
-    token = CharField(unique='true')
+    token = OauthField(unique='True')
 
     def get_oauth_token(self) -> str:
         """
@@ -48,25 +50,16 @@ class User(BaseModel):
         :return decrypted oauth token as a string:
         """
         return decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                       self.token)
+                       self.token).decode('utf8')
 
-    # def save(self):
-    #     """
-    #     Encypts oauth
-    #     :return:
-    #     """
-    #     self.token = encrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-    #                          self.token)
-    #     return super(User, self).save()
-
-
-class OauthField(CharField):
-    def db_value(self, value):
-        return encrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                       value)
-
-    def python_value(self, value):
-        return value
+    def save(self):
+        if db.database.database_handler.get_user(self.username) is None:
+            try:
+                # has this value been encrypted?
+                decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'], self.token)
+            except Exception as e:
+                self.token = encrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'], self.token)
+        return super(User, self).save()
 
 
 class Repo(BaseModel):
