@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-    <title>{% block headtitle %}Lintable{% endblock %}</title>
+    <title>Lintable</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.3.0/octicons.css">
@@ -14,26 +14,16 @@
     <nav class="navbar navbar-light bg-faded">
       <div class="container">
         <a class="navbar-brand" href="/">Lintable</a>
-        <ul class="nav navbar-nav pull-xs-right">
-          <li class="nav-item">
-            <span class="octicon octicon-octoface"></span>
-          </li>
-        </ul>
       </div>
     </nav>
 
-
     <div class="container">
-      {% block content %}
-        <div class="jumbotron m-t-2">
-            <h1 class="display-3">Lintable </h1>
-            <p class="lead">Coming soon!</p>
-            <hr class="m-y-2">
-            <p>We're excited to announce lintable, a github integration for linting your pull requests.  Lintable will only check the code that will be modified by the pull request.</p>
-          </div>
-      {% endblock %}
-      {% block footer %}
-      {% endblock %}
+      <div class="jumbotron m-t-2">
+        <h1 class="display-3">Lintable </h1>
+        <p class="lead">Coming soon!</p>
+        <hr class="m-y-2">
+        <p>We're excited to announce Lintable, a Github integration for linting your pull requests.  Lintable will only check the code that will be modified by the pull request.</p>
+      </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
