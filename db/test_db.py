@@ -12,9 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This is needed to set env vars before execution, needs to be first import
+from db.local_test_settings import *
 import unittest
-import db
 import logging
+from db.database import database_handler
+from db.models import User, Repo, Jobs
 from peewee import *
 from playhouse.test_utils import test_database
 
@@ -27,54 +30,58 @@ logging.basicConfig(filename='./db_tests.log', level=logging.DEBUG)
 
 class dbTests(unittest.TestCase):
     def setUp(self):
-        db.User._meta.database = test_db
-        db.Jobs._meta.database = test_db
-        db.Repo._meta.database = test_db
-        for i in [db.User, db.Jobs, db.Repo]:
+        self.db = database_handler()
+        User._meta.database = test_db
+        Jobs._meta.database = test_db
+        Repo._meta.database = test_db
+        for i in [User, Jobs, Repo]:
             if not i.table_exists():
                 test_db.create_table(i)
 
     def test_shouldHaveUser(self):
-        with test_database(test_db, (db.User)):
-            self.assertIsNotNone(db.User())
+        with test_database(test_db, ()):
+            self.assertIsNotNone(User())
 
     def test_shouldHaveJob(self):
-        with test_database(test_db, (db.User)):
-            self.assertIsNotNone(db.Jobs())
+        with test_database(test_db, ()):
+            self.assertIsNotNone(Jobs())
 
     def test_shouldHaveRepo(self):
-        with test_database(test_db, (db.User)):
-            self.assertIsNotNone(db.Repo())
+        with test_database(test_db, ()):
+            self.assertIsNotNone(Repo())
 
     def test_returns_none_for_missing_user(self):
-        with test_database(test_db, (db.User)):
-            self.assertIsNone(db.get_user(''))
+        with test_database(test_db, ()):
+            self.assertIsNone(self.db.get_user(''))
 
     def test_sucessfully_adds_user(self):
-        with test_database(test_db, (db.User)):
-            self.assertIsNone(db.get_user('new_user'))
+        with test_database(test_db, ()):
+            self.assertIsNone(self.db.get_user('new_user'))
 
             # exercise
-            person = db.User(username='new_user', token='dummyToken')
+            person = User(username='new_user', token='dummyToken',
+                          github_id='badId')
             person.save()
-            self.assertTrue(db.get_user('new_user').token == 'dummyToken')
+            self.assertTrue(self.db.get_user('new_user').get_oauth_token() == 'dummyToken')
 
             # cleanup
             self.assertTrue(person.delete_instance() == 1)
 
     def test_unique_id_generated(self):
-        with test_database(test_db, (db.User)):
+        with test_database(test_db, ()):
             # SUT
             self.assertIsNotNone('user_1')
             self.assertIsNotNone('user_2')
-            user_1 = db.User(username='user_1', token='dummyToken')
-            user_2 = db.User(username='user_2', token='dummyToken2')
+            user_1 = User(username='user_1', token='dummyToken',
+                          github_id='badId')
+            user_2 = User(username='user_2', token='dummyToken2',
+                          github_id='badId2')
             user_2.save()
             user_1.save()
 
             # exercise
-            self.assertNotEqual(db.get_user('user_1').id,
-                                db.get_user('user_2').id)
+            self.assertNotEqual(self.db.get_user('user_1').id,
+                                self.db.get_user('user_2').id)
 
             # cleanup
             self.assertTrue(

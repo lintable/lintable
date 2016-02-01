@@ -12,29 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from peewee import *
 
-"""
-Settings dictionary for lintweb.
-"""
 
-LINTWEB_SETTINGS = {
-    'peewee': {
-        'DATABASE_URL': os.environ.get('DATABASE_URL', 'postgres://user@localhost:5432/postgres')
-    },
-    'simple-crypt': {
-        'ENCRYPTION_KEY': os.environ.get('ENCRYPTION_KEY', None)
+class OauthField(CharField):
+    def db_value(self, value):
+        return value
 
-    }
-}
-
-"""
-Settings dictionary for lintball.
-"""
-
-LINTBALL_SETTINGS = {
-    'celery': {
-        'BROKER': os.environ.get('CELERY_BROKER', 'amqp://'),
-        'BACKEND': os.environ.get('CELERY_BACKEND', 'redis://')
-    }
-}
+    def python_value(self, value):
+        return value
