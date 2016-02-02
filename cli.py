@@ -16,6 +16,8 @@ import logging
 import sys
 from uuid import uuid4
 
+import click
+
 from git_handler.git_handler import GitHandler
 from lintball.lintball import lint_process
 from process_handler.log_handler import LogHandler
@@ -43,20 +45,23 @@ def parse_args():
     return git_repo
 
 
-def entry():
+@click.command()
+@click.argument('repo', type=click.Path(file_okay=False, exists=True))
+def entry(repo: sys.path):
     """
     This is the main entry point.
     It should be called if there is at least one command line argument
     to indicate where the git repo is.
     It then setups a log handler, a git handler and
     sends them to lint_process
+    :param repo: the path of the repository to be linted
     :return: int - Should return a 0 to indicate this was a success.
     """
     if len(sys.argv) < 2:
         return about()
     else:
         # get the git repo from the command line arguments
-        git_repo = parse_args()
+        git_repo = repo
 
         # setup a logger to log the output
         logger = logging.getLogger()
