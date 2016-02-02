@@ -12,14 +12,11 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-import json
 import os
-import requests
 from functools import partial
 from logging import getLogger
 from typing import Dict, Iterable
 from uuid import UUID
-from settings.settings import LINTWEB_SETTINGS
 
 #from git import Repo
 from lintball.lint_report import LintReport
@@ -55,31 +52,6 @@ def github_pull_hook(uuid: UUID, payload: Dict)-> (partial, partial, partial):
                                  pull_request_id=pull_request))
 
     return partial_functions
-
-
-def github_oauth_response(code: str)-> str:
-    url = LINTWEB_SETTINGS['github']['OAUTH_URL_POST']
-
-    # Construct outgoing data and a header
-    outgoing = {
-        'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
-        'client_secret': LINTWEB_SETTINGS['github']['CLIENT_SECRET'],
-        'code': code,
-        'redirect_url': LINTWEB_SETTINGS['github']['CALLBACK']
-    }
-    headers = {'Accept': 'application/json'}
-
-    # Post data to github and capture response then parse returned JSON
-    request = requests.post(url, data=outgoing, headers=headers)
-    payload = json.loads(request.text)
-    access_token = payload['access_token']
-    scope_given = payload['scope'].split(',')
-
-    scope_needed = LINTWEB_SETTINGS['github']['SCOPES'].split(',')
-    for perm in scope_needed:
-        if perm not in scope_given:
-            return None
-    return access_token
 
 
 def retrieve_files(uuid: UUID, owner: str, repository: str, pull_request_id: str, path: str, comment_id: int):

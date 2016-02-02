@@ -13,14 +13,17 @@
 #limitations under the License.
 
 """Supply the frontend pages."""
+import json
 
+import requests
+import logging
 from flask import request, render_template, redirect
 from lintweb import app
-from git import github
 from settings.settings import LINTWEB_SETTINGS
 import urllib.parse
 from github import Github
 # from lintball.lintball import lint_github
+logger = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
@@ -92,10 +95,32 @@ def github_oauth():
 def github_oauth_response():
     """Receive OAuth code and retrieve token"""
     code = request.args.get('code')
-    access_token = github.github_oauth_response(code=code)
+    url = LINTWEB_SETTINGS['github']['OAUTH_URL_POST']
 
-    if access_token == None:
-        return 'You did not accept our permissions.'
+    # Construct outgoing data and a header
+    outgoing = {
+        'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+        'client_secret': LINTWEB_SETTINGS['github']['CLIENT_SECRET'],
+        'code': code,
+        'redirect_url': LINTWEB_SETTINGS['github']['CALLBACK']
+    }
+    headers = {'Accept': 'application/json'}
+
+    # Post data to github and capture response then parse returned JSON
+    try:
+        github_request = requests.post(url, data=outgoing, headers=headers)
+    except requests.exceptions.RequestException as e:
+        logger.error('Error posting to github: {}'.format(e))
+
+    payload = json.loads(github_request.text)
+    access_token = payload['access_token']
+    scope_given = payload['scope'].split(',')
+
+    # Check if we were given the right permissions
+    scope_needed = LINTWEB_SETTINGS['github']['SCOPES'].split(',')
+    for perm in scope_needed:
+        if perm not in scope_given:
+            return 'You did not accept our permissions.'
 
     user = Github(access_token).get_user()
     github_user_id = user.id
