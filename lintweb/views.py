@@ -22,6 +22,7 @@ from lintweb import app
 from settings.settings import LINTWEB_SETTINGS
 import urllib.parse
 from github import Github
+from db import models
 # from lintball.lintball import lint_github
 logger = logging.getLogger(__name__)
 
@@ -131,8 +132,11 @@ def github_oauth_response():
         if perm not in scope_given:
             return 'You did not accept our permissions.'
 
-    user = Github(access_token).get_user()
-    github_user_id = user.id
+    # TODO: Check if user already exists before storing
+    github_user = Github(access_token).get_user()
+    github_user_id = github_user.id
 
-    # TODO: Store access_token under user_id
+    user = models.User(github_id=str(github_user_id), token=access_token)
+    user.save()
+
     return 'Your Oauth token is: {} and your github id is: {}'.format(access_token, github_user_id)
