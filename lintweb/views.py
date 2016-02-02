@@ -136,7 +136,7 @@ def github_oauth_response():
     github_user_id = github_user.id
 
     db = database.database_handler()
-    if db.get_user(github_user_id) is not None:
+    if db.get_user(github_user_id) is None:
         user = models.User(github_id=str(github_user_id), token=access_token)
         user.save()
 
