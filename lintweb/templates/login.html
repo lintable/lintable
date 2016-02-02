@@ -1,0 +1,24 @@
+{% extends "_wrapper.html" %}
+
+{% block headtitle %}Lintable | Log In{% endblock %}
+{% block pagetitle %}Log In{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <form class="col-md-6">
+      <fieldset class="form-group">
+        <label for="register-email">Email address</label>
+        <input type="email" class="form-control" id="register-email" placeholder="Enter email">
+      </fieldset>
+      <fieldset class="form-group">
+        <label for="register-password">Password</label>
+        <input type="password" class="form-control" id="register-password" placeholder="Enter password">
+      </fieldset>
+      <a class="btn btn-primary" href="/account" role="button">Log In</a>
+      <a class="btn btn-secondary" href="#" role="button">Reset Password</a>
+    </form>
+    <div class="col-md-6">
+      <p class="lead m-t-2">If you have trouble logging in and can't reset your password, check out our <a href="/support">Support</a> page.</p>
+    </div>
+  </div>
+{% endblock %}

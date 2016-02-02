@@ -1,0 +1,24 @@
+{% extends "_wrapper.html" %}
+
+{% block headtitle %}Lintable | Account Registration{% endblock %}
+{% block pagetitle %}Account Registration{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <form class="col-md-6">
+      <fieldset class="form-group">
+        <label for="register-email">Email address</label>
+        <input type="email" class="form-control" id="register-email" placeholder="Enter email">
+        <small class="text-muted">We won't share your email with anyone else.</small>
+      </fieldset>
+      <fieldset class="form-group">
+        <label for="register-password">Password</label>
+        <input type="password" class="form-control" id="register-password" placeholder="Enter password">
+      </fieldset>
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <div class="col-md-6">
+      <p class="lead m-t-2">Make sure you enter a valid email address, since we'll send an account activation email there.</p>
+    </div>
+  </div>
+{% endblock %}
