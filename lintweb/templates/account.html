@@ -1,68 +1,36 @@
 {% extends "_wrapper.html" %}
 
 {% block headtitle %}Lintable | Account{% endblock %}
-{% block pagetitle %}Account{% endblock %}
+{% block pagetitle %}Account: {{ username }}{% endblock %}
 
 {% block content %}
-  <div class="card">
-    <div class="card-header">
-      repo-name-here
+  {% for repo in repos %}
+    <div class="card">
+      <div class="card-header">
+        <a href="{{ repo.url }}">{{ repo.url }}</a>
 
-      <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
+        <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
+      </div>
+      <div class="card-block">
+        <form>
+          <fieldset class="form-group">
+            <label for="repo-token-{{ repo.url|e }}">Repo URL</label>
+            <input type="text" class="form-control"
+              id="repo-token-{{ repo.url|e }}"
+              value="{{ repo.url }}"
+              placeholder="http://...">
+          </fieldset>
+          <fieldset class="form-group">
+            <label for="repo-token-{{ repo.url|e }}">Private Token</label>
+            <input type="text" class="form-control"
+              id="repo-token-{{ repo.url|e }}"
+              value="{{ repo.token }}"
+              placeholder="Private token goes here">
+          </fieldset>
+        </form>
+      </div>
     </div>
-    <div class="card-block">
-      <form>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Repo URL</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="http://...">
-        </fieldset>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Private Token</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="Private token goes here">
-        </fieldset>
-      </form>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      repo-name-here
-
-      <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
-    </div>
-    <div class="card-block">
-      <form>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Repo URL</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="http://...">
-        </fieldset>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Private Token</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="Private token goes here">
-        </fieldset>
-      </form>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-header">
-      repo-name-here
-
-      <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
-    </div>
-    <div class="card-block">
-      <form>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Repo URL</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="http://...">
-        </fieldset>
-        <fieldset class="form-group">
-          <label for="repo-token-123">Private Token</label>
-          <input type="text" class="form-control" id="repo-token-123" placeholder="Private token goes here">
-        </fieldset>
-      </form>
-    </div>
-  </div>
+  {% endfor %}
 
   <p><a class="btn btn-primary" href="#"><span class="octicon octicon-plus"></span> Add Repo</a></p>
 {% endblock %}
