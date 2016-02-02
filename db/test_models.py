@@ -50,7 +50,7 @@ class ModelTests(unittest.TestCase):
             # Exercise
             new_user.save()
             self.assertNotEqual(new_user.token, 'dummyToken')
-            user = self.db.get_user('new_user')
+            user = self.db.get_user('badId')
             self.assertNotEqual(user.token, 'dummyToken')
 
             # Clean up
@@ -59,13 +59,13 @@ class ModelTests(unittest.TestCase):
     def test_encrypts_token_only_once(self):
         with test_database(test_db, ()):
             # SUT
-            self.assertIsNone(self.db.get_user('new_user'))
+            self.assertIsNone(self.db.get_user('badId'))
             new_user = User(username='new_user', token='dummyToken',
                             github_id='badId')
             new_user.save()
 
             # Exercise
-            user = self.db.get_user('new_user')
+            user = self.db.get_user('badId')
             user.save()
             self.assertEqual(user.get_oauth_token(), 'dummyToken')
             self.assertNotEqual(user.token, 'dummyToken')
@@ -80,18 +80,27 @@ class ModelTests(unittest.TestCase):
     def test_decrypts_token(self):
         with test_database(test_db, ()):
             # SUT
-            self.assertIsNone(self.db.get_user('new_user'))
+            self.assertIsNone(self.db.get_user('badId'))
             new_user = User(username='new_user', token='dummyToken',
                             github_id='badId')
             new_user.save()
 
             # Exercise
-            user = self.db.get_user('new_user')
+            user = self.db.get_user('badId')
             self.assertEqual(user.get_oauth_token(), 'dummyToken')
             self.assertNotEqual(user.token, 'dummyToken')
 
             # Clean up
             user.delete_instance()
+
+
+    def test_get_token_from_repo(self):
+        # SUT
+        user = User(username='this', github_id='that', token='dummyToken')
+        user.save()
+        repo = Repo(owner=user, url='a')
+        repo.save()
+        self.assertEqual(user.get_oauth_token(), repo.get_oauth_token())
 
 
 if __name__ == '__main__':

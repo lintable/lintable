@@ -53,7 +53,7 @@ class User(BaseModel):
                        self.token).decode('utf8')
 
     def save(self):
-        if db.database.database_handler.get_user(self.username) is None:
+        if db.database.database_handler.get_user(self.github_id) is None:
             try:
                 # has this value been encrypted?
                 decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'], self.token)
@@ -63,16 +63,24 @@ class User(BaseModel):
 
 
 class Repo(BaseModel):
-    id = ForeignKeyField(User, related_name='repos')
+    repo_id = PrimaryKeyField()
+    owner = ForeignKeyField(User, related_name='repos', to_field='id')
     url = CharField(unique='true')
-    token = ForeignKeyField(User)
+
+    def get_oauth_token(self) -> str:
+        """
+        Get the unencrypted OAuth token for the owner of this repo
+
+        :return decrypted oauth token as a string:
+        """
+        return self.owner.get_oauth_token()
 
 
 class Jobs(BaseModel):
-    id = ForeignKeyField(User, related_name='jobs', to_field='id')
-    jobId = PrimaryKeyField()
+    job_id = PrimaryKeyField()
+    repo_owner = ForeignKeyField(User, related_name='jobs', to_field='id')
     url = ForeignKeyField(Repo, to_field='url')
-    startTime = DateTimeField()
-    endTime = DateTimeField(null=True)
-    commentNumber = IntegerField()
+    start_time = DateTimeField()
+    end_time = DateTimeField(null=True)
+    comment_number = IntegerField()
     status = CharField()
