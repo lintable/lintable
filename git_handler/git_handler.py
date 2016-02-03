@@ -41,6 +41,7 @@ class GitHandler(object):
         self.last_merge = None
         self.previous_commit = None
         self.local_path = temp_path.format(uuid=self.uuid)
+        self.cloned_repo_path = join(self.local_path, 'repo')
         return
 
     def started(self):
@@ -59,9 +60,9 @@ class GitHandler(object):
         It will clone the repo into the local_path/repo.
         :return:
         """
-        self.process_handler.clone_repo(self.local_path)
+        self.process_handler.clone_repo(self.cloned_repo_path)
         self.repo = Repo(path=self.repo_url)
-        self.repo.clone(path=join(self.local_path, 'repo'))
+        self.repo.clone(path=self.cloned_repo_path)
         self.last_merge = self.get_last_merge()
         self.previous_commit = self.repo.commit(
             '{commit}~1'.format(commit=self.last_merge))
