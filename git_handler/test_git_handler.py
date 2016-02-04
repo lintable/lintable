@@ -96,9 +96,11 @@ class GitHandlerTests(unittest.TestCase):
         self.logger.debug('{dir} contains {files}'.format(dir=self.tmp_repo, files=os.listdir(self.tmp_repo)))
         self.logger.debug('{dir} contains {files}'.format(dir=self.git_handler.cloned_repo_path,
                                                           files=os.listdir(self.git_handler.cloned_repo_path)))
+
         # assert that the original repo and the cloned repo have the same files
-        self.assertListEqual(os.listdir(self.tmp_repo),
-                             os.listdir(self.git_handler.cloned_repo_path))
+        # do this by converting the list of filenames to sets and do a set comparison
+        self.assertSetEqual(set(os.listdir(self.tmp_repo)),
+                            set(os.listdir(self.git_handler.cloned_repo_path)))
 
 
 if __name__ == '__main__':
