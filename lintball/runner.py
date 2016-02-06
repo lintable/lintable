@@ -22,8 +22,7 @@ from settings.settings import LINTBALL_SETTINGS
 runner = Celery('runner',
                 broker=LINTBALL_SETTINGS['celery']['broker'],
                 backend=LINTBALL_SETTINGS['celery']['backend'],
-                include=['git.lint_github',
-                         'git.lint_git_local'])
+                include=['lintball.lint_github'])
 
 # Optional configuration, see the application user guide.
 runner.conf.update(

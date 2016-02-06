@@ -30,6 +30,9 @@ class WhitespaceFileLinter(LintWrapper):
     ws_regex = re.compile("^(.*?)(\s+)$")
     logger = logging.getLogger(__name__)
 
+    def __repr__(self):
+        return 'Whitespace Linter'
+
     def lint(self, filename: str) -> List[LintError]:
         total_matches = []
         lines = self.get_lines(filename)

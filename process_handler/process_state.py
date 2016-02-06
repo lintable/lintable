@@ -12,29 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from enum import Enum
 
-"""
-Settings dictionary for lintweb.
-"""
 
-LINTWEB_SETTINGS = {
-    'peewee': {
-        'DATABASE_URL': os.environ.get('DATABASE_URL', 'postgres://user@localhost:5432/postgres')
-    },
-    'simple-crypt': {
-        'ENCRYPTION_KEY': os.environ.get('ENCRYPTION_KEY', None)
-
-    }
-}
-
-"""
-Settings dictionary for lintball.
-"""
-
-LINTBALL_SETTINGS = {
-    'celery': {
-        'broker': os.environ.get('CELERY_BROKER', 'amqp://'),
-        'backend': os.environ.get('CELERY_BACKEND', 'redis://')
-    }
-}
+class ProcessState(Enum):
+    """
+    This tracks the state of the linting process
+    """
+    STARTED = 1,  # process has started
+    CLONE_REPO = 2,  # the repo is being cloned
+    RETRIEVE_FILES = 3,  # the files are being retrieved from the repo
+    LINT_FILES = 4,  # the retrieved files are being linted
+    REPORT = 5,  # the report from the linting process is shown
+    FINISHED = 6  # the linting process is finished
