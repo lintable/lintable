@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is needed to set env vars before execution, needs to be first import
-from db.local_test_settings import *
 import unittest
 import logging
 from db.database import database_handler, User, Repo, Jobs
@@ -22,6 +20,8 @@ from playhouse.test_utils import test_database
 import datetime
 
 # create and initialize a local test database in memory
+from settings.settings import LINTWEB_SETTINGS
+
 test_db = SqliteDatabase(':memory:')
 
 # just put the log messages into a file
@@ -30,6 +30,9 @@ logging.basicConfig(filename='./db_tests.log', level=logging.DEBUG)
 
 class dbTests(unittest.TestCase):
     def setUp(self):
+        # Override our default encryption key.
+        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
+
         self.db = database_handler()
         User._meta.database = test_db
         Jobs._meta.database = test_db
