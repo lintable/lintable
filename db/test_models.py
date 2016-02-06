@@ -17,8 +17,9 @@ from db.local_test_settings import *
 import unittest
 import logging
 from db.database import database_handler
-from db.models import User, Repo, Jobs
+from db.models import User, Repo, Jobs, GithubString
 from peewee import *
+from peewee import SelectQuery
 from playhouse.test_utils import test_database
 import datetime
 import simplecrypt
@@ -36,7 +37,8 @@ class ModelTests(unittest.TestCase):
         User._meta.database = test_db
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
-        for i in [User, Jobs, Repo]:
+        GithubString._meta.database = test_db
+        for i in [User, Jobs, Repo, GithubString]:
             if not i.table_exists():
                 test_db.create_table(i)
 
@@ -45,12 +47,12 @@ class ModelTests(unittest.TestCase):
             # SUT
             self.assertIsNone(self.db.get_user('new_user'))
             new_user = User(username='new_user', token='dummyToken',
-                            github_id='badId')
+                            github_id=2)
 
             # Exercise
             new_user.save()
             self.assertNotEqual(new_user.token, 'dummyToken')
-            user = self.db.get_user('badId')
+            user = self.db.get_user(2)
             self.assertNotEqual(user.token, 'dummyToken')
 
             # Clean up
@@ -59,13 +61,12 @@ class ModelTests(unittest.TestCase):
     def test_encrypts_token_only_once(self):
         with test_database(test_db, ()):
             # SUT
-            self.assertIsNone(self.db.get_user('badId'))
-            new_user = User(username='new_user', token='dummyToken',
-                            github_id='badId')
+            self.assertIsNone(self.db.get_user(2))
+            new_user = User(token='dummyToken', github_id=2)
             new_user.save()
 
             # Exercise
-            user = self.db.get_user('badId')
+            user = self.db.get_user(2)
             user.save()
             self.assertEqual(user.get_oauth_token(), 'dummyToken')
             self.assertNotEqual(user.token, 'dummyToken')
@@ -80,27 +81,30 @@ class ModelTests(unittest.TestCase):
     def test_decrypts_token(self):
         with test_database(test_db, ()):
             # SUT
-            self.assertIsNone(self.db.get_user('badId'))
+            self.assertIsNone(self.db.get_user(2))
             new_user = User(username='new_user', token='dummyToken',
-                            github_id='badId')
+                            github_id=2)
             new_user.save()
 
             # Exercise
-            user = self.db.get_user('badId')
+            user = self.db.get_user(2)
             self.assertEqual(user.get_oauth_token(), 'dummyToken')
             self.assertNotEqual(user.token, 'dummyToken')
 
             # Clean up
             user.delete_instance()
 
-
     def test_get_token_from_repo(self):
         # SUT
-        user = User(username='this', github_id='that', token='dummyToken')
+        user = User(github_id=23, token='dummyToken')
         user.save()
-        repo = Repo(owner=user, url='a')
+        repo = Repo(owner=user, url='a', repo_id=2)
         repo.save()
         self.assertEqual(user.get_oauth_token(), repo.get_oauth_token())
+
+    def test_state(self):
+        state = GithubString(state_string='state')
+        self.assertTrue(state.save() == 1)
 
 
 if __name__ == '__main__':

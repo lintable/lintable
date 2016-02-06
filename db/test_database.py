@@ -16,12 +16,10 @@
 from db.local_test_settings import *
 import unittest
 import logging
-from db.database import database_handler
-from db.models import User, Repo, Jobs
+from db.database import database_handler, User, Repo, Jobs
 from peewee import *
 from playhouse.test_utils import test_database
 import datetime
-
 
 # create and initialize a local test database in memory
 test_db = SqliteDatabase(':memory:')
@@ -59,25 +57,27 @@ class dbTests(unittest.TestCase):
     def test_find_user_by_id(self):
         with test_database(test_db, ()):
             # SUT
-            user = User(username='this', github_id='that', token='dummyToken')
+            user = User(github_id=2, token='dummyToken')
             user.save()
 
             # exercise
-            person = self.db.get_user('that')
-            twin = self.db.get_user(person.id)
+            person = self.db.get_user(2)
+            twin = self.db.get_user(person.github_id)
 
             self.assertEqual(self.assertEqual(person, user),
                              self.assertEqual(user, twin))
 
             # clean up
-            user.delete_instance()
-            self.assertIsNone(self.db.get_user('that'))
+            person.delete_instance()
+            self.assertIsNone(self.db.get_user(2))
             self.assertEqual(person.id, twin.id)
+            user.delete_instance()
+            twin.delete_instance()
 
     def test_get_missing_repo(self):
         with test_database(test_db, ()):
             # SUT
-            user = User(username='that', github_id='doeasaurausrex', token='a')
+            user = User(github_id=2, token='a')
             user.save()
 
             for repo in user.repos:
@@ -88,17 +88,19 @@ class dbTests(unittest.TestCase):
     def test_get_repos(self):
         with test_database(test_db, ()):
             # SUT
-            user = User(username='that', github_id='dopeasaurusrex', token='a')
+            user = User(github_id=2, token='a')
             user.save()
-            repo1 = Repo(owner=user, url='https://github.com/user/repo.git')
-            repo2 = Repo(owner=user, url='https://github.com/user/repo2.git')
+            repo1 = Repo(repo_id=1, owner=user,
+                         url='https://github.com/user/repo.git')
+            repo2 = Repo(repo_id=2, owner=user,
+                         url='https://github.com/user/repo2.git')
             repo1.save()
             repo2.save()
-            user2 = User(username='that2', github_id='dopeasaurusrex', token='a')
-            repo3 = repo2 = Repo(owner=user, url='https://github.com/user/repo2.git')
+            user2 = User(github_id=1, token='a')
+            repo3 = repo2 = Repo(repo_id=123, owner=user,
+                                 url='https://github.com/user/repo2.git')
             user2.save()
             repo3.save()
-
 
             # exercise
             # check native peewee
@@ -106,101 +108,81 @@ class dbTests(unittest.TestCase):
                 self.assertEqual(repo.owner.id, user.id)
                 self.assertTrue(repo.url == repo1.url or
                                 repo.url == repo2.url)
-            # check db_handler function
-            for repo in self.db.get_repos_for_user(user.id):
-                self.assertEqual(repo.owner.id, user.id)
-                self.assertTrue(repo.url == repo1.url or
-                                repo.url == repo2.url)
 
             self.assertTrue(user.repos == 2)
-            self.assertTrue(self.db.get_repos_for_user(user.id) == 2)
 
-            #clean up
+            # clean up
             user.delete_instance()
+            user2.delete_instance()
             repo1.delete_instance()
             repo2.delete_instance()
+            repo3.delete_instance()
 
     def test_get_job(self):
         with test_database(test_db, ()):
-            user = User(username='that', github_id='dopeasaurusrex', token='a')
+            user = User(github_id=1, token='a')
             user.save()
 
-            repo = Repo(owner=user, url='https://github.com/user/job.git')
+            repo = Repo(repo_id=23, owner=user,
+                        url='https://github.com/user/job.git')
             repo.save()
 
-            job = Jobs(repo_owner=user, url=repo,start_time=datetime.datetime.now(),comment_number=1, status = 'pending')
+            job = Jobs(job_id=1, repo_owner=user, repo=repo,
+                       start_time=datetime.datetime.now(), comment_number=1,
+                       status='pending')
             job.save()
 
             self.assertEqual(self.db.get_job(job.job_id), job)
 
+            user.delete_instance()
+            repo.delete_instance()
+            job.delete_instance()
+
     def test_get_all_jobs(self):
         with test_database(test_db, ()):
             # SUT
-            user = User(username='that', github_id='dopeasaurusrex', token='a')
+            user = User(github_id=1, token='a')
             user.save()
-            repo = Repo(owner=user, url='https://github.com/user/job.git')
+            repo = Repo(repo_id=24, owner=user,
+                        url='https://github.com/user/job.git')
             repo.save()
 
-            job1 = Jobs(repo_owner=user, url=repo,start_time=datetime.datetime.now(),comment_number=1, status = 'pending')
-            job2 = Jobs(repo_owner=user, url=repo,start_time=datetime.datetime.now(),comment_number=2, status = 'pending')
+            job1 = Jobs(job_id=1,repo_owner=user, repo=repo,
+                        start_time=datetime.datetime.now(),
+                        comment_number=1, status='pending')
+            job2 = Jobs(job_id=2,repo_owner=user, repo=repo,
+                        start_time=datetime.datetime.now(),
+                        comment_number=2, status='pending')
             job1.save()
             job2.save()
 
             # exercise
-            # check native peewee
             for job in user.jobs:
-                self.assertEqual(job.repo_owner.id, user.id)
-                self.assertTrue(job.comment_number == job1.comment_number or
-                                job.comment_number == job2.comment_number)
-            # check db_handler function
-            for job in self.db.get_jobs_for_user(user.id):
-                self.assertEqual(job.repo_owner.id, user.id)
+                self.assertEqual(job.repo_owner.github_id, user.github_id)
                 self.assertTrue(job.comment_number == job1.comment_number or
                                 job.comment_number == job2.comment_number)
 
             self.assertTrue(user.jobs == 2)
-            self.assertTrue(self.db.get_jobs_for_user(user.id) == 2)
 
-            #clean up
+            # clean up
             user.delete_instance()
             job1.delete_instance()
             job2.delete_instance()
-
+            repo.delete_instance()
 
     def test_sucessfully_adds_user(self):
         with test_database(test_db, ()):
             # SUT
-            self.assertIsNone(self.db.get_user('badId'))
+            self.assertIsNone(self.db.get_user(1))
 
             # exercise
-            person = User(username='new_user', token='dummyToken',
-                          github_id='badId')
+            person = User(token='dummyToken', github_id=1)
             person.save()
             self.assertTrue(
-                self.db.get_user('badId').get_oauth_token() == 'dummyToken')
+                self.db.get_user(1).get_oauth_token() == 'dummyToken')
 
             # cleanup
-            self.assertTrue(person.delete_instance() == 1)
-
-    def test_unique_id_generated(self):
-        with test_database(test_db, ()):
-            # SUT
-            self.assertIsNotNone('user_1')
-            self.assertIsNotNone('user_2')
-            user_1 = User(username='user_1', token='dummyToken',
-                          github_id='badId')
-            user_2 = User(username='user_2', token='dummyToken2',
-                          github_id='badId2')
-            user_2.save()
-            user_1.save()
-
-            # exercise
-            self.assertNotEqual(self.db.get_user('badId').id,
-                                self.db.get_user('badId2').id)
-
-            # cleanup
-            self.assertTrue(
-                user_1.delete_instance() == user_2.delete_instance() == 1)
+            person.delete_instance()
 
 
 if __name__ == '__main__':
