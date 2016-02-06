@@ -55,9 +55,9 @@ class database_handler():
         """
         try:
             if isinstance(identifier, int):
-                user = User.get(User.id == identifier)
-            if isinstance(identifier, str):
                 user = User.get(User.github_id == identifier)
+            if isinstance(identifier, str):
+                user = User.get(User.username == identifier)
         except User.DoesNotExist as e:
             user = None
             logger.error(
@@ -111,29 +111,3 @@ class database_handler():
             logger.error(e)
 
         return job
-
-    def get_repos_for_user(self, identifier: Union[int, str]) -> Iterable[Repo]:
-        """
-        Finds any repos associated with a given username or user ID.
-
-        :param identifier:
-        :return Iterable object of Repo or None:
-        """
-        try:
-            repos = self.get_user(identifier).repos
-        except Exception as e:
-            logger.warn(e)
-            repos = None
-        return repos
-
-    def get_jobs_for_user(self, identifier: Union[int, str]) -> Iterable[Jobs]:
-        """
-        Finds any jobs currently in the system for a given username or user ID.
-        :param identifier:
-        :return Iterable object of Jobs or None:
-        """
-        try:
-            jobs = self.get_user(identifier).jobs
-        except Exception as e:
-            jobs = None
-        return jobs

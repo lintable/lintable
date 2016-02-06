@@ -37,12 +37,11 @@ class BaseModel(Model):
             logger.error("Unable to connect.\nException: {0}".format(e))
 
 
-
 class User(BaseModel):
-    id = PrimaryKeyField(primary_key='true')
-    username = CharField(unique='true', null='True')
-    github_id = CharField(unique='true')
-    token = OauthField(unique='True')
+    id = PrimaryKeyField()
+    github_id = IntegerField(unique=True)
+    username = CharField(null=True)
+    token = OauthField()
 
     def get_oauth_token(self) -> str:
         """
@@ -56,16 +55,20 @@ class User(BaseModel):
         if db.database.database_handler.get_user(self.github_id) is None:
             try:
                 # has this value been encrypted?
-                decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'], self.token)
+                decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+                        self.token)
             except Exception as e:
-                self.token = encrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'], self.token)
+                self.token = encrypt(
+                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+                    self.token)
         return super(User, self).save()
 
 
 class Repo(BaseModel):
-    repo_id = PrimaryKeyField()
-    owner = ForeignKeyField(User, related_name='repos', to_field='id')
-    url = CharField(unique='true')
+    id = PrimaryKeyField()
+    repo_id = IntegerField(unique=True)
+    owner = ForeignKeyField(User, related_name='repos')
+    url = CharField()
 
     def get_oauth_token(self) -> str:
         """
@@ -77,10 +80,14 @@ class Repo(BaseModel):
 
 
 class Jobs(BaseModel):
-    job_id = PrimaryKeyField()
-    repo_owner = ForeignKeyField(User, related_name='jobs', to_field='id')
-    url = ForeignKeyField(Repo, to_field='url')
+    job_id = IntegerField(unique=True)
+    repo_owner = ForeignKeyField(User, related_name='jobs')
+    repo = ForeignKeyField(Repo)
     start_time = DateTimeField()
     end_time = DateTimeField(null=True)
     comment_number = IntegerField()
     status = CharField()
+
+
+class GithubString(BaseModel):
+    state_string = CharField()
