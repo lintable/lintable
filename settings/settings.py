@@ -31,8 +31,9 @@ LINTWEB_SETTINGS = {
         'CALLBACK': os.environ.get('LINTWEB_FLASK_CALLBACK', 'localhost/callback'),
         'OAUTH_URL': os.environ.get('LINTWEB_OAUTH_URL', 'https://github.com/login/oauth/authorize'),
         'OAUTH_URL_POST': os.environ.get('LINTWEB_OAUTH_URL_POST', 'https://github.com/login/oauth/access_token'),
-        'SCOPES': os.environ.get('LINTWEB_SCOPES', 'repo:status')
-    }
+        'SCOPES': os.environ.get('LINTWEB_SCOPES', 'repo')
+    },
+    'DEBUG' : os.environ.get('DEBUG', True)
 }
 
 """

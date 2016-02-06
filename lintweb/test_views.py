@@ -14,6 +14,7 @@
 
 from lintweb import app
 import unittest
+from settings.settings import LINTWEB_SETTINGS
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):
@@ -29,8 +30,16 @@ class ViewsTests(unittest.TestCase):
 
     def test_register_status_code(self):
         result = self.app.get('/register')
-        self.assertEqual(result.status_code, 302)
+
+        if not LINTWEB_SETTINGS['DEBUG']:
+            self.assertEqual(result.status_code, 302)
+        else:
+            self.assertEqual(result.status_code, 404)
 
     def test_index_status_code(self):
         result = self.app.get('/callback')
-        self.assertEqual(result.status_code, 200)
+
+        if not LINTWEB_SETTINGS['DEBUG']:
+            self.assertEqual(result.status_code, 302)
+        else:
+            self.assertEqual(result.status_code, 404)
