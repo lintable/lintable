@@ -27,7 +27,7 @@ from db.models import User
 # from lintball.lintball import lint_github
 logger = logging.getLogger(__name__)
 
-DEBUG = False
+DEBUG = True
 
 # TODO: Instance a database connection here using database.database_handler()
 app_database = None
