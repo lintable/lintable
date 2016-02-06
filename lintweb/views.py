@@ -162,6 +162,7 @@ if not DEBUG:
         headers = {'Accept': 'application/json'}
 
         # Post data to github and capture response then parse returned JSON
+        github_request = None
         try:
             github_request = requests.post(url, data=outgoing, headers=headers)
         except requests.exceptions.RequestException as e:
@@ -181,7 +182,7 @@ if not DEBUG:
         github_user_id = github_user.id
 
         if database_handler.get_user(github_user_id) is None:
-            user = User(github_id=str(github_user_id), token=access_token)
+            user = User(github_id=github_user_id, token=access_token)
             user.save()
 
         return redirect(url_for('account'))
