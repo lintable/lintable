@@ -16,11 +16,14 @@ from peewee import *
 from peewee import SelectQuery
 from typing import Iterable
 import logging
-from db.models import User, Repo,Jobs
+from db.models import User, Repo, Jobs
+from typing import Union
+
 logger = logging.getLogger(__name__)
 
+
 class database_handler():
-    def get_repo(self, url: str) -> Repo:
+    def get_repo(self, identifier: Union[int, str]) -> Repo:
         """
         Finds a repo for a given URL
 
@@ -28,55 +31,42 @@ class database_handler():
         :return Repo or None:
         """
         try:
-            repo = Repo.get(Repo.url == url)
+            if isinstance(identifier, int):
+                user = Repo.get(Repo.repo_id == identifier)
+            if isinstance(identifier, str):
+                user = Repo.get(Repo.url == identifier)
         except Repo.DoesNotExist as e:
             repo = None
             logger.error(
-                'No repo found for url: {0} .\nException:\n\t{1}'.format(url, e))
+                'No repo found for identifier: {0} .\nException:\n\t{1}'.format(
+                    identifier, e))
         except Exception as e:
             repo = None
             logger.error(e)
         return repo
 
     @staticmethod
-    def get_user(username: str) -> User:
+    def get_user(identifier: Union[int, str]) -> User:
         """
-        Finds a user for a given user name
+        Finds a user for a given ID or username.
 
-        :param username:
+        :param identifier:
         :return User or None:
         """
         try:
-            user = User.get(User.username == username)
+            if isinstance(identifier, int):
+                user = User.get(User.id == identifier)
+            if isinstance(identifier, str):
+                user = User.get(User.github_id == identifier)
         except User.DoesNotExist as e:
             user = None
             logger.error(
-                'No user found for user name: {0}.\nException:\n\t{1}'.format(
-                    username, e))
+                'No user found for identifier: {0}.\nException:\n\t{1}'.format(
+                    identifier, e))
         except Exception as e:
             user = None
             logger.error(e)
-
         return user
-
-
-    def get_jobs_for_user(self, username: str) -> Iterable[Jobs]:
-        """
-        Finds any jobs currently in the system for a given user name.
-
-        :param username:
-        :return Iterable object of Jobs or None:
-        """
-        try:
-            jobs = SelectQuery(Jobs).join(User).where(User.id == Jobs.id,
-                                                      User.username == username)
-        except Exception as e:
-            jobs = None
-            logger.error(
-                'No jobs found for user with username:{0}.\nException:\n\t{'
-                '1}'.format(username, e))
-        return jobs
-
 
     def set_job_status(self, job_id: int, status: str) -> int:
         """
@@ -93,10 +83,57 @@ class database_handler():
 
         except Jobs.DoesNotExist as e:
             logger.error(
-                'No job found with job id: {0}.\nException:\n\t{1}'.format(job_id,
-                                                                           e))
+                'No job found with job id: {0}.\nException:\n\t{1}'.format(
+                    job_id,
+                    e))
             success = None
         except Exception as e:
             logger.error(e)
             success = None
         return success
+
+    def get_job(self, identifier: int) -> Jobs:
+        """
+        Finds a job for a given job ID.
+
+        :param identifier:
+        :return Jobs or None:
+        """
+        try:
+            job = Jobs.get(Jobs.job_id == identifier)
+        except Jobs.DoesNotExist as e:
+            job = None
+            logger.error(
+                'No job found for identifier: {0}.\nException:\n\t{1}'.format(
+                    identifier, e))
+        except Exception as e:
+            job = None
+            logger.error(e)
+
+        return job
+
+    def get_repos_for_user(self, identifier: Union[int, str]) -> Iterable[Repo]:
+        """
+        Finds any repos associated with a given username or user ID.
+
+        :param identifier:
+        :return Iterable object of Repo or None:
+        """
+        try:
+            repos = self.get_user(identifier).repos
+        except Exception as e:
+            logger.warn(e)
+            repos = None
+        return repos
+
+    def get_jobs_for_user(self, identifier: Union[int, str]) -> Iterable[Jobs]:
+        """
+        Finds any jobs currently in the system for a given username or user ID.
+        :param identifier:
+        :return Iterable object of Jobs or None:
+        """
+        try:
+            jobs = self.get_user(identifier).jobs
+        except Exception as e:
+            jobs = None
+        return jobs

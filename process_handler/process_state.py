@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from enum import Enum
 
-os.environ['ENCRYPTION_KEY'] = 'test_password'
+
+class ProcessState(Enum):
+    """
+    This tracks the state of the linting process
+    """
+    STARTED = 1,  # process has started
+    CLONE_REPO = 2,  # the repo is being cloned
+    RETRIEVE_FILES = 3,  # the files are being retrieved from the repo
+    LINT_FILES = 4,  # the retrieved files are being linted
+    REPORT = 5,  # the report from the linting process is shown
+    FINISHED = 6  # the linting process is finished

@@ -8,6 +8,7 @@ amqp==1.4.9               # via kombu
 anyjson==0.3.3            # via kombu
 billiard==3.3.0.22        # via celery
 Celery==3.1.19
+click==6.2
 Flask==0.10.1
 gitdb==0.6.4              # via gitpython
 GitPython==1.0.1
@@ -23,6 +24,7 @@ pycrypto==2.6.1           # via simple-crypt
 pytz==2015.7              # via celery
 Redis==2.10.5
 Requests==2.9.1
+rstr==2.2.3
 simple-crypt==4.1.7
 smmap==0.9.0              # via gitdb
 Werkzeug==0.11.3

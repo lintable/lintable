@@ -1,17 +1,33 @@
+{#
+Copyright 2015-2016 Capstone Team G
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+#}
+
 {% extends "_wrapper.html" %}
 
-{% block headtitle %}Lintable | Status {% if jobid %}for job {{ jobid|e }}{% endif %}{% endblock %}
+{% block headtitle %}Lintable | Status {% if identifier %}for job {{ identifier|e }}{% endif %}{% endblock %}
 
 {% block pagetitle %}
   Status
-  {% if jobid %}
-    for job {{ jobid|e }}
+  {% if identifier %}
+    for job {{ identifier|e }}
     <small><a class="btn btn-info btn-sm" href="/status"><span class="octicon octicon-triangle-up"></span></a></small>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if not jobid %}
+  {% if not identifier %}
     <p class="lead">You currently have these jobs active.</p>
 
     <table class="table table-striped">
@@ -36,18 +52,25 @@
     </table>
   {% endif %}
 
-  {% if jobid %}
-    <p class="lead">This job is <b>currently running</b>. It's been running for <b>3 hours</b>.</p>
+  {% if identifier %}
+    <p class="lead">
+      This job is
+      {% if currently_running %}
+        <b>currently running</b>. It's been running for <b>{{ duration }}</b>.
+      {% else %}
+        <b>finished</b>. It took <b>{{ duration }}</b>.
+      {% endif %}
+    </p>
 
     <dl>
       <dt>Job ID</dt>
-      <dd>123456</dd>
+      <dd>{{ identifier }}</dd>
 
       <dt>Repo</dt>
-      <dd>https://github.com/reponame/repo</dd>
+      <dd><a href="{{ job_url }}">{{ job_url }}</a></dd>
 
-      <dt>Last Commit</dt>
-      <dd><code>101dcac</code></dd>
+      <dt>Status</dt>
+      <dd>{{ job_status }}</dd>
     </dl>
 
     <p><a href="#" class="btn btn-danger">Cancel Job</a></p>
