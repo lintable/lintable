@@ -2,9 +2,16 @@
 
 ## Getting set up for development
 
-Before anything else, you need to have Python up and running.
+Lintball has several pre-requisites that will need to be installed first.
+* Ensure you have postgresql development headers installed.
+* Ensure you have a working C++ build environment.
+* _(For development purposes you may wish to have redis and rabbitmq as well.)_
 
-* On Ubuntu Linux, run `apt-get install python3 python3-pip`.
+Lintball uses Python's type hinting available in python 3.5 and newer.
+
+* On Ubuntu Linux:
+    * Python 3.5 does not currently come from apt by default. It is available from other sources such as [deadsnakes](https://launchpad.net/~fkrull/+archive/ubuntu/deadsnakes).
+    * Run `apt-get install python3.5 python3.5-dev python3-pip`.
 * On OS X, install [Homebrew](http://brew.sh), then `brew install python3`.
 * On Windows, install [Chocolately](https://chocolatey.org), then `choco install python3`. Beware of possible executable name conflicts with python2, as noted on the [package description](https://chocolatey.org/packages/python3). By default the executable to use for the instructions below is is `pip.exe` and not `pip3.exe`.
 
