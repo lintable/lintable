@@ -13,36 +13,61 @@
 # limitations under the License.
 
 import os
-from typing import Iterable
+import tempfile
+from typing import Iterable, Union
 
 from git import Repo, Commit
 from process_handler.process_handler import ProcessHandler
 
-join = os.path.join
-
-temp_path = '/tmp/{uuid}'
-
 
 class GitHandler(object):
     """
-    This is a class for interacting with git.
-    It takes 2 constructor arguments.
-    handler - ProcessHandler - for tracking the state of retrieving the repo and files
-    repo_url - str - the url of the git Repo we are linting
+    This is a class for interacting with a git repository.
+    It should handle the following steps:
+    started - Post constructor setup, this is largely to delegate to the ProcessHandler
+    clone_repo - clone the repository at repo_url into the local_path/repo directory
     """
-    def __init__(self, process_handler: ProcessHandler, repo_url: str,
-                 branch: str = 'master'):
+
+    def __init__(self, process_handler: ProcessHandler, repo_url: str, local_path: Union[None, str] = None):
+        """
+        :param process_handler: The ProcessHandler to delegate to for IO handling
+        :param repo_url: The URL of the repository to clone
+        :param local_path: The local path to store the cloned repository and the files pulled from the commits
+        :return:
+        """
         self.repo_url = repo_url
         self.repo = None
         self.files = []
-        self.branch = branch
         self.process_handler = process_handler
         self.uuid = process_handler.uuid
         self.last_merge = None
         self.previous_commit = None
-        self.local_path = temp_path.format(uuid=self.uuid)
-        self.cloned_repo_path = join(self.local_path, 'repo')
+        self.local_path = local_path if local_path else tempfile.mkdtemp()
         return
+
+    @property
+    def a_path(self):
+        """
+        The directory where files from commit a will be stored
+        :return:
+        """
+        return os.path.join(self.local_path, 'a')
+
+    @property
+    def b_path(self):
+        """
+        The directory where files from commit b will be stored
+        :return:
+        """
+        return os.path.join(self.local_path, 'b')
+
+    @property
+    def cloned_repo_path(self):
+        """
+        The directory where the cloned repo will be stored
+        :return:
+        """
+        return os.path.join(self.local_path, 'repo')
 
     def started(self):
         """
@@ -77,15 +102,15 @@ class GitHandler(object):
         """
         self.process_handler.retrieve_changed_file_set(self.last_merge,
                                                        self.previous_commit)
-        os.mkdir(join(self.local_path, 'a'))
-        os.mkdir(join(self.local_path, 'b'))
+        os.mkdir(self.a_path)
+        os.mkdir(self.b_path)
         a_files = list(self.last_merge.stats.files.keys())
+
         self.files = a_files
-        self.pull_files_from_commit(self.last_merge, a_files,
-                                    join(self.local_path, 'a'))
+        self.pull_files_from_commit(self.last_merge, a_files, self.a_path)
+
         b_files = list(self.previous_commit.stats.files.keys())
-        self.pull_files_from_commit(self.previous_commit, b_files,
-                                    join(self.local_path, 'b'))
+        self.pull_files_from_commit(self.previous_commit, b_files, self.b_path)
 
         return
 
@@ -104,13 +129,13 @@ class GitHandler(object):
             contents = self.repo.git.show(
                 '{sha1}:{filename}'.format(sha1=commit.hexsha,
                                            filename=filename))
-            file = join(path, filename)
+            file = os.path.join(path, filename)
             self.process_handler.retrieve_file_from_commit(filename, commit)
             dir_path = os.path.dirname(filename)
 
             # if the target directory doesn't exist, make it
-            if dir_path and not os.path.exists(join(path, dir_path)):
-                os.makedirs(join(path, dir_path))
+            if dir_path and not os.path.exists(os.path.join(path, dir_path)):
+                os.makedirs(os.path.join(path, dir_path))
 
             # save the file
             with open(file, 'w+') as output:
