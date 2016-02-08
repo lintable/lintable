@@ -16,12 +16,12 @@ import os
 from typing import Iterable
 
 from git import Repo, Commit
-from process_handler.process_handler import ProcessHandler
+
+from lintable_processes.process_handler import ProcessHandler
 
 join = os.path.join
 
 temp_path = '/tmp/{uuid}'
-
 
 class GitHandler(object):
     """

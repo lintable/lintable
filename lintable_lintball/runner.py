@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-
 import logging
 
 from celery import Celery
-from settings.settings import LINTBALL_SETTINGS
+
+from lintable_settings.settings import LINTBALL_SETTINGS
 
 runner = Celery('runner',
                 broker=LINTBALL_SETTINGS['celery']['broker'],

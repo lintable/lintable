@@ -13,18 +13,20 @@
 # limitations under the License.
 
 """Supply the frontend pages."""
+
 import json
+import logging
+import urllib.parse
 
 import requests
-import logging
 from flask import request, render_template, redirect, url_for
-from lintweb import app
-from settings.settings import LINTWEB_SETTINGS
-import urllib.parse
 from github import Github
-from db.database import database_handler
-from db.models import User
-# from lintball.lintball import lint_github
+
+from lintable_db.database import database_handler
+from lintable_db.models import User
+from lintable_web import app
+from lintable_settings.settings import LINTWEB_SETTINGS
+
 logger = logging.getLogger(__name__)
 
 DEBUG = LINTWEB_SETTINGS['DEBUG']

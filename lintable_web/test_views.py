@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from lintweb import app
 import unittest
-from settings.settings import LINTWEB_SETTINGS
+
+from lintable_settings.settings import LINTWEB_SETTINGS
+from lintable_web import app
 
 class ViewsTests(unittest.TestCase):
     def setUp(self):

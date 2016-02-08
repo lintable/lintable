@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 import os
 import shutil
@@ -21,11 +22,10 @@ from uuid import uuid4
 from git import Commit, Repo
 import rstr
 
-from git_handler.git_handler import GitHandler
-from process_handler.process_handler import ProcessHandler
+from lintable_git.git_handler import GitHandler
+from lintable_processes.process_handler import ProcessHandler
 
 logging.basicConfig(filename='./git_handler_tests.log', level=logging.DEBUG)
-
 
 class GitHandlerTests(unittest.TestCase):
     def setUp(self):

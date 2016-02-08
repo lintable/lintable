@@ -12,21 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
-import logging
-from db.database import database_handler, User, Repo, Jobs
-from peewee import *
-from playhouse.test_utils import test_database
 import datetime
+import logging
+import unittest
+
+from peewee import SqliteDatabase
+from playhouse.test_utils import test_database
+
+from lintable_db.database import database_handler, User, Repo, Jobs
+from lintable_settings.settings import LINTWEB_SETTINGS
 
 # create and initialize a local test database in memory
-from settings.settings import LINTWEB_SETTINGS
-
 test_db = SqliteDatabase(':memory:')
 
 # just put the log messages into a file
 logging.basicConfig(filename='./db_tests.log', level=logging.DEBUG)
-
 
 class dbTests(unittest.TestCase):
     def setUp(self):

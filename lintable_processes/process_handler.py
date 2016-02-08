@@ -14,14 +14,11 @@
 
 from uuid import UUID
 
-from git import Repo
+from git import Commit, Repo
 
-from git import Commit
-
-from lintball.lint_report import LintReport
-from process_handler.do_nothing_handler import DoNothingHandler
-from process_handler.process_state import ProcessState
-
+from lintable_lintball.lint_report import LintReport
+from lintable_processes.do_nothing_handler import DoNothingHandler
+from lintable_processes.process_state import ProcessState
 
 class ProcessHandler(object):
     """

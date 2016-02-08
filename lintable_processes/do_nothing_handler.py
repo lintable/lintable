@@ -15,8 +15,8 @@
 from uuid import UUID
 
 from git import Commit, Repo
-from lintball.lint_report import LintReport
 
+from lintable_lintball.lint_report import LintReport
 
 class DoNothingHandler(object):
     """
