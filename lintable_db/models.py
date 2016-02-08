@@ -52,7 +52,7 @@ class User(BaseModel):
         return decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                        self.token).decode('utf8')
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if User.get(User.github_id == self.github_id) is None:
             try:
                 # has this value been encrypted?
@@ -62,7 +62,7 @@ class User(BaseModel):
                 self.token = encrypt(
                     LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                     self.token)
-        return super(User, self).save()
+        return super(User, self).save(*args, **kwargs)
 
 
 class Repo(BaseModel):
