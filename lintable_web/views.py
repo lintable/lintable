@@ -22,9 +22,9 @@ import requests
 from flask import request, render_template, redirect, url_for
 from github import Github
 
-# from lintable_db.database import DatabaseHandler
+from lintable_db.database import DatabaseHandler
 from lintable_db.models import User
-from lintable_web import app
+from lintable_web.__init__ import app
 from lintable_settings.settings import LINTWEB_SETTINGS
 
 logger = logging.getLogger(__name__)
