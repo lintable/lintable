@@ -13,15 +13,21 @@
 # limitations under the License.
 
 """Supply the frontend pages."""
+import json
 
-# from datetime import datetime
-from flask import request, render_template
-
-# from db import database
-# from lintball import lintball
+import requests
+import logging
+from flask import request, render_template, redirect, url_for
 from lintweb import app
+from settings.settings import LINTWEB_SETTINGS
+import urllib.parse
+from github import Github
+from db.database import database_handler
+from db.models import User
+# from lintball.lintball import lint_github
+logger = logging.getLogger(__name__)
 
-DEBUG = True
+DEBUG = LINTWEB_SETTINGS['DEBUG']
 
 # TODO: Instance a database connection here using database.database_handler()
 app_database = None
@@ -121,3 +127,62 @@ if not DEBUG:
         # TODO: Make this actually work. Currently, lintball crashes on import.
         # lintball.lint_github.delay(payload=payload)
         return
+
+    @app.route('/register')
+    def github_oauth():
+        """Redirect user to github OAuth registeration page."""
+        url = LINTWEB_SETTINGS['github']['OAUTH_URL']
+        params = {
+            'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+            'redirect_uri' : LINTWEB_SETTINGS['github']['CALLBACK'],
+            'scope' : LINTWEB_SETTINGS['github']['SCOPES']
+        }
+
+        params = urllib.parse.urlencode(params)
+        url = '{}?{}'.format(url, params)
+
+        return redirect(url, code=302)
+
+    @app.route('/callback')
+    def github_oauth_response():
+        """Receive OAuth code and retrieve token"""
+        code = request.args.get('code')
+        url = LINTWEB_SETTINGS['github']['OAUTH_URL_POST']
+
+        if code is None:
+            return "No github code found"
+
+        # Construct outgoing data and a header
+        outgoing = {
+            'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+            'client_secret': LINTWEB_SETTINGS['github']['CLIENT_SECRET'],
+            'code': code,
+            'redirect_url': LINTWEB_SETTINGS['github']['CALLBACK']
+        }
+        headers = {'Accept': 'application/json'}
+
+        # Post data to github and capture response then parse returned JSON
+        github_request = None
+        try:
+            github_request = requests.post(url, data=outgoing, headers=headers)
+        except requests.exceptions.RequestException as e:
+            logger.error('Error posting to github: {}'.format(e))
+
+        payload = json.loads(github_request.text)
+        access_token = payload['access_token']
+        scope_given = payload['scope'].split(',')
+
+        # Check if we were given the right permissions
+        scope_needed = LINTWEB_SETTINGS['github']['SCOPES'].split(',')
+        for perm in scope_needed:
+            if perm not in scope_given:
+                return 'You did not accept our permissions.'
+
+        github_user = Github(access_token).get_user()
+        github_user_id = github_user.id
+
+        if database_handler.get_user(github_user_id) is None:
+            user = User(github_id=github_user_id, token=access_token)
+            user.save()
+
+        return redirect(url_for('account'))
