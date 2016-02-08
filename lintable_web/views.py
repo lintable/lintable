@@ -54,8 +54,10 @@ if not DEBUG:
         #       (in the future we can extend this to an admin viewing any user)
         if identifier is not None:
             user = DatabaseHandler.get_user(identifier)
-            repos = user.repos
-
+            if user is not None:
+                repos = user.repos
+            else:
+                repos = None
             return render_template('account.html')
             # return render_template('account.html',
             #                        username=user.username,
@@ -95,7 +97,9 @@ if not DEBUG:
         else:
             # TODO: Use logged in cookies to get jobs for user
             # user_id = cookie.get_id()
-            # jobs = DatabaseHandler.get_user(user_id).jobs
+            # user = DatabaseHandler.get_user(user_id)
+            # if user is not None:
+            #   jobs = user.jobs
             return render_template('status.html')
 
 
