@@ -22,7 +22,7 @@ import requests
 from flask import request, render_template, redirect, url_for
 from github import Github
 
-from lintable_db.database import database_handler
+# from lintable_db.database import DatabaseHandler
 from lintable_db.models import User
 from lintable_web import app
 from lintable_settings.settings import LINTWEB_SETTINGS
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 DEBUG = LINTWEB_SETTINGS['DEBUG']
 
-# TODO: Instance a database connection here using database.database_handler()
+# TODO: Instance a database connection here using DatabaseHandler?
 app_database = None
 
 if DEBUG:
