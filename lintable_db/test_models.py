@@ -17,7 +17,7 @@ import unittest
 
 from playhouse.test_utils import test_database
 
-from lintable_db.database import database_handler
+from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, Repo, Jobs, GithubString
 from lintable_settings.settings import LINTWEB_SETTINGS
 
@@ -32,7 +32,7 @@ class ModelTests(unittest.TestCase):
         # Override our default encryption key.
         LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
 
-        self.db = database_handler()
+        self.db = DatabaseHandler()
         User._meta.database = test_db
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
