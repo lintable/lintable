@@ -19,7 +19,6 @@ from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
                     DateTimeField, CharField, PostgresqlDatabase)
 from simplecrypt import decrypt, encrypt
 
-from lintable_db.database import DatabaseHandler
 from lintable_db.fields import OauthField
 from lintable_settings.settings import LINTWEB_SETTINGS
 
@@ -54,7 +53,7 @@ class User(BaseModel):
                        self.token).decode('utf8')
 
     def save(self):
-        if DatabaseHandler.get_user(self.github_id) is None:
+        if User.get(User.github_id == self.github_id) is None:
             try:
                 # has this value been encrypted?
                 decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
