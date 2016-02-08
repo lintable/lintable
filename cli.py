@@ -47,7 +47,9 @@ def parse_args():
 
 @click.command()
 @click.argument('repo', type=click.Path(file_okay=False, exists=True))
-def entry(repo: sys.path):
+@click.option('--commit_a', '-a', default='HEAD', type=str)
+@click.option('--commit_b', '-b', default='HEAD~1', type=str)
+def entry(repo: sys.path, commit_a: str, commit_b: str):
     """
     This is the main entry point.
     It should be called if there is at least one command line argument
@@ -72,7 +74,7 @@ def entry(repo: sys.path):
         process_handler = ProcessHandler(logger=LogHandler(logger=logger), uuid=uuid4(), repo=git_repo)
 
         # create a git handler to clone the repo, locate the last merge, and retrieve the files from that commit
-        git_handler = GitHandler(process_handler, git_repo)
+        git_handler = GitHandler(process_handler, git_repo, commit_a, commit_b)
 
         # process the results from the git handler via the linters
         lint_process(git_handler, process_handler)
