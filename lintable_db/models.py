@@ -16,7 +16,7 @@ import logging
 from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
-                    DateTimeField, CharField)
+                    DateTimeField, CharField, PostgresqlDatabase)
 from simplecrypt import decrypt, encrypt
 
 from lintable_db.database import DatabaseHandler
