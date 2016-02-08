@@ -15,6 +15,7 @@
 import logging
 import unittest
 
+from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
 
 from lintable_db.database import DatabaseHandler
