@@ -1,7 +1,8 @@
 from flask import Flask
-app = Flask(__name__)
 
-import lintweb.views
+import lintable_web.views
+
+app = Flask(__name__)
 
 if __name__ == '__main__':
     app.run()

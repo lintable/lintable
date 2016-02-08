@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import logging
 from typing import List
 
 import re
-from lintball.lint_error import LintError
-from lintball.lint_wrapper import LintWrapper
-import logging
+
+from lintable_lintball.lint_error import LintError
+from lintable_lintball.lint_wrapper import LintWrapper
 
 
 """

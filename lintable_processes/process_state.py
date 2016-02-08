@@ -14,7 +14,6 @@
 
 from enum import Enum
 
-
 class ProcessState(Enum):
     """
     This tracks the state of the linting process

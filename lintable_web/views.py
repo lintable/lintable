@@ -13,23 +13,25 @@
 # limitations under the License.
 
 """Supply the frontend pages."""
+
 import json
+import logging
+import urllib.parse
 
 import requests
-import logging
 from flask import request, render_template, redirect, url_for
-from lintweb import app
-from settings.settings import LINTWEB_SETTINGS
-import urllib.parse
 from github import Github
-from db.database import database_handler
-from db.models import User
-# from lintball.lintball import lint_github
+
+from lintable_db.database import DatabaseHandler
+from lintable_db.models import User
+from lintable_web.__init__ import app
+from lintable_settings.settings import LINTWEB_SETTINGS
+
 logger = logging.getLogger(__name__)
 
 DEBUG = LINTWEB_SETTINGS['DEBUG']
 
-# TODO: Instance a database connection here using database.database_handler()
+# TODO: Instance a database connection here using DatabaseHandler?
 app_database = None
 
 if DEBUG:
@@ -181,7 +183,7 @@ if not DEBUG:
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
 
-        if database_handler.get_user(github_user_id) is None:
+        if DatabaseHandler.get_user(github_user_id) is None:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
 

@@ -18,15 +18,14 @@ import os
 from typing import List
 from uuid import uuid4
 
-from git_handler.git_handler import GitHandler
-from lintball.lint_error import LintError
-from lintball.lint_report import LintReport
-from lintball.lint_wrapper import LintWrapper
-from lintball.runner import runner
-from linters.whitespace_file_linter import WhitespaceFileLinter
-from process_handler.log_handler import LogHandler
-from process_handler.process_handler import ProcessHandler
-
+from lintable_git.git_handler import GitHandler
+from lintable_lintball.lint_error import LintError
+from lintable_lintball.lint_report import LintReport
+from lintable_lintball.lint_wrapper import LintWrapper
+from lintable_lintball.runner import runner
+from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
+from lintable_processes.log_handler import LogHandler
+from lintable_processes.process_handler import ProcessHandler
 
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):

@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import unittest
 
-from lintball.lint_error import LintError
-from linters.whitespace_file_linter import WhitespaceFileLinter
-
+from lintable_lintball.lint_error import LintError
+from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
 
 class DetectTrailingWhitespaceTestCase(unittest.TestCase):
     def setUp(self):

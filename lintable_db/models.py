@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from peewee import *
 import logging
-from db.fields import OauthField
-import db.database
-from settings.settings import LINTWEB_SETTINGS
 from urllib.parse import urlparse
+
+from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
+                    DateTimeField, CharField, PostgresqlDatabase)
 from simplecrypt import decrypt, encrypt
 
-logger = logging.getLogger(__name__)
+from lintable_db.fields import OauthField
+from lintable_settings.settings import LINTWEB_SETTINGS
 
+logger = logging.getLogger(__name__)
 
 class BaseModel(Model):
     class Meta:
@@ -51,17 +52,16 @@ class User(BaseModel):
         return decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                        self.token).decode('utf8')
 
-    def save(self):
-        if db.database.database_handler.get_user(self.github_id) is None:
-            try:
-                # has this value been encrypted?
-                decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                        self.token)
-            except Exception as e:
-                self.token = encrypt(
-                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+    def save(self, *args, **kwargs):
+        try:
+            # has this value been encrypted?
+            decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                     self.token)
-        return super(User, self).save()
+        except Exception as e:
+            self.token = encrypt(
+                LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+                self.token)
+        return super(User, self).save(*args, **kwargs)
 
 
 class Repo(BaseModel):

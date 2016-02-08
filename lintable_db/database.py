@@ -12,17 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from peewee import *
-from peewee import SelectQuery
-from typing import Iterable
 import logging
-from db.models import User, Repo, Jobs
 from typing import Union
+
+from lintable_db.models import User, Repo, Jobs
 
 logger = logging.getLogger(__name__)
 
-
-class database_handler():
+class DatabaseHandler:
     def get_repo(self, identifier: Union[int, str]) -> Repo:
         """
         Finds a repo for a given URL

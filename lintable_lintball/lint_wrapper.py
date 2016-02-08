@@ -16,7 +16,8 @@ import subprocess
 from typing import List
 
 from abc import ABC, abstractmethod
-from lintball.lint_error import LintError
+
+from lintable_lintball.lint_error import LintError
 
 """ An abstract base class defining a simple contract for linters and no implementation. """
 

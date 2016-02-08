@@ -12,31 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unittest
 import logging
-from db.database import database_handler
-from db.models import User, Repo, Jobs, GithubString
-from peewee import *
-from peewee import SelectQuery
+import unittest
+
+from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
-import datetime
-import simplecrypt
+
+from lintable_db.database import DatabaseHandler
+from lintable_db.models import User, Repo, Jobs, GithubString
+from lintable_settings.settings import LINTWEB_SETTINGS
 
 # create and initialize a local test database in memory
-from settings.settings import LINTWEB_SETTINGS
-
 test_db = SqliteDatabase(':memory:')
 
 # just put the log messages into a file
 logging.basicConfig(filename='./model_tests.log', level=logging.DEBUG)
-
 
 class ModelTests(unittest.TestCase):
     def setUp(self):
         # Override our default encryption key.
         LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
 
-        self.db = database_handler()
+        self.db = DatabaseHandler()
         User._meta.database = test_db
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
