@@ -53,15 +53,14 @@ class User(BaseModel):
                        self.token).decode('utf8')
 
     def save(self, *args, **kwargs):
-        if User.get(User.github_id == self.github_id) is None:
-            try:
-                # has this value been encrypted?
-                decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                        self.token)
-            except Exception as e:
-                self.token = encrypt(
-                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+        try:
+            # has this value been encrypted?
+            decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                     self.token)
+        except Exception as e:
+            self.token = encrypt(
+                LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+                self.token)
         return super(User, self).save(*args, **kwargs)
 
 
