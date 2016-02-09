@@ -32,10 +32,16 @@ def lint_github(payload: json, task_id=uuid4()):
     repo_url = 'ssh://git@github.com:{full_name}.git'.format(
         full_name=payload['repo']['full_name'])
 
+    sha1_a = payload['head']['sha']
+    sha1_b = payload['base']['sha']
+
     process_handler = ProcessHandler(repo=repo_url, uuid=task_id,
                                      logger=LogHandler(logging.getLogger()))
 
-    git_handler = GitHandler(process_handler=process_handler, repo_url=repo_url)
+    git_handler = GitHandler(process_handler=process_handler,
+                             repo_url=repo_url,
+                             sha1_a=sha1_a,
+                             sha1_b=sha1_b)
 
     lint_process(git_handler, process_handler)
 
