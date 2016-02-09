@@ -27,6 +27,7 @@ from lintable_processes.process_handler import ProcessHandler
 
 logging.basicConfig(filename='./git_handler_tests.log', level=logging.DEBUG)
 
+
 class GitHandlerTests(unittest.TestCase):
     def setUp(self):
         self.logger = logging.getLogger('test_git_handler')
@@ -55,7 +56,11 @@ class GitHandlerTests(unittest.TestCase):
         # commit file a as commit a
         self.commit_a = self.commit_files(a_file, msg='commit a')
 
-        self.git_handler = GitHandler(ProcessHandler(self.tmp_repo, uuid4()), self.tmp_repo)
+        self.git_handler = GitHandler(ProcessHandler(self.tmp_repo, uuid4()),
+                                      self.tmp_repo,
+                                      self.commit_a.hexsha,
+                                      self.commit_b.hexsha)
+
         self.git_handler.started()
 
     def tearDown(self):
