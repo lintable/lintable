@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
+from datetime import datetime
 import logging
 import unittest
 
@@ -131,7 +131,7 @@ class dbTests(unittest.TestCase):
             repo.save()
 
             job = Jobs(job_id=1, repo_owner=user, repo=repo,
-                       start_time=datetime.datetime.now(), comment_number=1,
+                       start_time=datetime.now(), comment_number=1,
                        status='pending')
             job.save()
 
@@ -151,10 +151,10 @@ class dbTests(unittest.TestCase):
             repo.save()
 
             job1 = Jobs(job_id=1,repo_owner=user, repo=repo,
-                        start_time=datetime.datetime.now(),
+                        start_time=datetime.now(),
                         comment_number=1, status='pending')
             job2 = Jobs(job_id=2,repo_owner=user, repo=repo,
-                        start_time=datetime.datetime.now(),
+                        start_time=datetime.now(),
                         comment_number=2, status='pending')
             job1.save()
             job2.save()

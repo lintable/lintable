@@ -21,6 +21,7 @@ import urllib.parse
 import requests
 from flask import request, render_template, redirect, url_for
 from github import Github
+from datetime import datetime
 
 from lintable_db.database import DatabaseHandler
 from lintable_db.models import User
@@ -30,9 +31,6 @@ from lintable_settings.settings import LINTWEB_SETTINGS
 logger = logging.getLogger(__name__)
 
 DEBUG = LINTWEB_SETTINGS['DEBUG']
-
-# TODO: Instance a database connection here using DatabaseHandler?
-app_database = None
 
 if DEBUG:
     @app.route('/')
@@ -46,6 +44,7 @@ if not DEBUG:
         """View the homepage."""
         return render_template('index.html')
 
+
     @app.route('/account')
     @app.route('/account/<identifier>')
     def account(identifier=None):
@@ -54,10 +53,11 @@ if not DEBUG:
         # TODO: Only allowing viewing a user page for a logged in user
         #       (in the future we can extend this to an admin viewing any user)
         if identifier is not None:
-            # TODO: Use these once there's an actual db to connect to
-            # user = app_database.get_user(identifier)
-            # repos = app_database.get_repos_for_user(identifier)
-
+            user = DatabaseHandler.get_user(identifier)
+            if user is not None:
+                repos = user.repos
+            else:
+                repos = None
             return render_template('account.html')
             # return render_template('account.html',
             #                        username=user.username,
@@ -66,27 +66,26 @@ if not DEBUG:
             user = None
             return render_template('account.html')
 
+
     @app.route('/login')
     def login():
         """Log into an account, or trigger OAuth with a new account."""
         # TODO: Wire this into OAuth
         return render_template('login.html')
 
+
     @app.route('/status')
     @app.route('/status/<identifier>')
     def status(identifier=None):
         """Get a list of active jobs, or get the status of a job in progress."""
         if identifier is not None:
-            # TODO: Actually pull the job from the database
-            # job = app_database.get_job(identifier)
-            #
-            # TODO: Do math here with start/end times
-            # if not job.endTime:
-            #     currently_running = True
-            #     duration = datetime.now() - job.startTime
-            # else:
-            #     currently_running = False
-            #     duration = job.endTime - job.startTime
+            job = DatabaseHandler.get_job(identifier)
+            if not job.endTime:
+                currently_running = True
+                duration = datetime.now() - job.startTime
+            else:
+                currently_running = False
+                duration = job.endTime - job.startTime
 
             return render_template('status.html')
             # return render_template('status.html',
@@ -97,7 +96,12 @@ if not DEBUG:
             #                        status=job.status)
         else:
             # TODO: Use logged in cookies to get jobs for user
+            # user_id = cookie.get_id()
+            # user = DatabaseHandler.get_user(user_id)
+            # if user is not None:
+            #   jobs = user.jobs
             return render_template('status.html')
+
 
     @app.route('/terms')
     def terms():
@@ -105,11 +109,13 @@ if not DEBUG:
         # TODO: Possibly pull content from Markdown file
         return render_template('terms.html')
 
+
     @app.route('/privacy')
     def privacy():
         """View the privacy policy."""
         # TODO: Possibly pull content from Markdown file
         return render_template('privacy.html')
+
 
     @app.route('/security')
     def security():
@@ -117,10 +123,12 @@ if not DEBUG:
         # TODO: Possibly pull content from Markdown file
         return render_template('security.html')
 
+
     @app.route('/support')
     def support():
         """View the support page."""
         return render_template('support.html')
+
 
     @app.route('/payload', methods=['POST'])
     def github_payload():
@@ -130,20 +138,22 @@ if not DEBUG:
         # lintball.lint_github.delay(payload=payload)
         return
 
+
     @app.route('/register')
     def github_oauth():
         """Redirect user to github OAuth registeration page."""
         url = LINTWEB_SETTINGS['github']['OAUTH_URL']
         params = {
-            'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
-            'redirect_uri' : LINTWEB_SETTINGS['github']['CALLBACK'],
-            'scope' : LINTWEB_SETTINGS['github']['SCOPES']
+            'client_id': LINTWEB_SETTINGS['github']['CLIENT_ID'],
+            'redirect_uri': LINTWEB_SETTINGS['github']['CALLBACK'],
+            'scope': LINTWEB_SETTINGS['github']['SCOPES']
         }
 
         params = urllib.parse.urlencode(params)
         url = '{}?{}'.format(url, params)
 
         return redirect(url, code=302)
+
 
     @app.route('/callback')
     def github_oauth_response():
@@ -156,7 +166,7 @@ if not DEBUG:
 
         # Construct outgoing data and a header
         outgoing = {
-            'client_id' : LINTWEB_SETTINGS['github']['CLIENT_ID'],
+            'client_id': LINTWEB_SETTINGS['github']['CLIENT_ID'],
             'client_secret': LINTWEB_SETTINGS['github']['CLIENT_SECRET'],
             'code': code,
             'redirect_url': LINTWEB_SETTINGS['github']['CALLBACK']
