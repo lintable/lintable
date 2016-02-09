@@ -103,8 +103,15 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(user.get_oauth_token(), repo.get_oauth_token())
 
     def test_state(self):
+        #SUT
         state = GithubString(state_string='state')
+
+        # Exercise
         self.assertTrue(state.save() == 1)
+
+        # cleanup
+        self.assertTrue(state.delete_instance() == 1)
+
 
 
 if __name__ == '__main__':
