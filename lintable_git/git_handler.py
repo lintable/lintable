@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import os
+import shutil
 import tempfile
 
 from typing import Iterable, List, Optional
@@ -20,6 +21,7 @@ from typing import Iterable, List, Optional
 from git import Repo, Commit
 
 from lintable_processes.process_handler import ProcessHandler
+
 
 class GitHandler(object):
     """
@@ -54,6 +56,9 @@ class GitHandler(object):
         self.commit_b = None  # type: Optional[Commit]
         self.local_path = local_path if local_path else tempfile.mkdtemp()  # type: str
         return
+
+    def __del__(self):
+        shutil.rmtree(self.local_path)
 
     @property
     def a_path(self):
