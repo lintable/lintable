@@ -18,10 +18,10 @@ from celery import Celery
 
 from lintable_settings.settings import LINTBALL_SETTINGS
 
-runner = Celery('runner',
+runner = Celery('lintable_lintball.runner',
                 broker=LINTBALL_SETTINGS['celery']['broker'],
                 backend=LINTBALL_SETTINGS['celery']['backend'],
-                include=['lintball.lint_github'])
+                include=['lintable_lintball.lintball'])
 
 # Optional configuration, see the application user guide.
 runner.conf.update(
