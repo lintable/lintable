@@ -14,6 +14,7 @@
 
 import logging
 from typing import Union
+from uuid import uuid4
 
 from lintable_db.models import User, Repo, Jobs
 
@@ -89,7 +90,7 @@ class DatabaseHandler:
             success = None
         return success
 
-    def get_job(self, identifier: int) -> Jobs:
+    def get_job(self, identifier: uuid4) -> Jobs:
         """
         Finds a job for a given job ID.
 

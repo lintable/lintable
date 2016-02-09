@@ -16,7 +16,7 @@ import logging
 from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
-                    DateTimeField, CharField, PostgresqlDatabase)
+                    DateTimeField, CharField, PostgresqlDatabase, UUIDField)
 from simplecrypt import decrypt, encrypt
 
 from lintable_db.fields import OauthField
@@ -80,7 +80,7 @@ class Repo(BaseModel):
 
 
 class Jobs(BaseModel):
-    job_id = IntegerField(unique=True)
+    job_id = UUIDField(unique=True)
     repo_owner = ForeignKeyField(User, related_name='jobs')
     repo = ForeignKeyField(Repo)
     start_time = DateTimeField()
