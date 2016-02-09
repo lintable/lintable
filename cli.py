@@ -18,10 +18,10 @@ from uuid import uuid4
 
 import click
 
-from git_handler.git_handler import GitHandler
-from lintball.lintball import lint_process
-from process_handler.log_handler import LogHandler
-from process_handler.process_handler import ProcessHandler
+from lintable_git.git_handler import GitHandler
+from lintable_lintball.lintball import lint_process
+from lintable_processes.log_handler import LogHandler
+from lintable_processes.process_handler import ProcessHandler
 
 
 def about():
@@ -46,8 +46,10 @@ def parse_args():
 
 
 @click.command()
+@click.option('--commit_a', '-a', default='HEAD', type=str)
+@click.option('--commit_b', '-b', default='HEAD~1', type=str)
 @click.argument('repo', type=click.Path(file_okay=False, exists=True))
-def entry(repo: sys.path):
+def entry(repo: sys.path, commit_a: str, commit_b: str):
     """
     This is the main entry point.
     It should be called if there is at least one command line argument
@@ -55,6 +57,8 @@ def entry(repo: sys.path):
     It then setups a log handler, a git handler and
     sends them to lint_process
     :param repo: the path of the repository to be linted
+    :param commit_b: the commit to be comapred against, defaults to HEAD~1
+    :param_commit_a: the commit to be comapred with, defaults to HEAD
     :return: int - Should return a 0 to indicate this was a success.
     """
     if len(sys.argv) < 2:
@@ -71,8 +75,8 @@ def entry(repo: sys.path):
         # create a process handler that delegates to the logger
         process_handler = ProcessHandler(logger=LogHandler(logger=logger), uuid=uuid4(), repo=git_repo)
 
-        # create a git handler to clone the repo, locate the last merge, and retrieve the files from that commit
-        git_handler = GitHandler(process_handler, git_repo)
+        # create a git handler to clone the repo and comapre the two commits
+        git_handler = GitHandler(process_handler, git_repo, commit_a, commit_b)
 
         # process the results from the git handler via the linters
         lint_process(git_handler, process_handler)
