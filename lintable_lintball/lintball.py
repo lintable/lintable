@@ -27,13 +27,18 @@ from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
 from lintable_processes.log_handler import LogHandler
 from lintable_processes.process_handler import ProcessHandler
 
+
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):
-    repo_url = 'ssh://git@github.com:{full_name}.git'.format(
-        full_name=payload['repo']['full_name'])
 
-    sha1_a = payload['head']['sha']
-    sha1_b = payload['base']['sha']
+    if payload['action'] != 'opened' and payload['action'] != 'synchronized':
+        return
+
+    repo_url = 'https://github.com/{full_name}.git'.format(
+        full_name=payload['repository']['full_name'])
+
+    sha1_a = payload['pull_request']['head']['sha']
+    sha1_b = payload['pull_request']['base']['sha']
 
     process_handler = ProcessHandler(repo=repo_url, uuid=task_id,
                                      logger=LogHandler(logging.getLogger()))
