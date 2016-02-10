@@ -18,6 +18,8 @@ import tempfile
 
 from typing import Iterable, List, Optional
 
+from urllib.parse import urlparse
+
 from git import Repo, Commit
 
 from lintable_processes.process_handler import ProcessHandler
@@ -45,15 +47,17 @@ class GitHandler(object):
         :param local_path: The local path to store the cloned repository and the files pulled from the commits
         :return:
         """
-        self.repo_url = repo_url
-        self.repo = None  # type: Optional[Repo]
-        self.files = []  # type: List[str]
+
         self.process_handler = process_handler  # type: ProcessHandler
+        self.repo_url = repo_url
+        self.remote = urlparse(repo_url).scheme != ""  # type: bool
         self.uuid = process_handler.uuid
         self.sha1_a = sha1_a  # type: str
         self.sha1_b = sha1_b  # type: str
         self.commit_a = None  # type: Optional[Commit]
         self.commit_b = None  # type: Optional[Commit]
+        self.repo = None  # type: Optional[Repo]
+        self.files = []  # type: List[str]
         self.local_path = local_path if local_path else tempfile.mkdtemp()  # type: str
         return
 
@@ -84,7 +88,6 @@ class GitHandler(object):
         """
         return os.path.join(self.local_path, 'repo')
 
-
     def started(self):
         """
         This is a stub function. It should be called after object creation so that any
@@ -102,8 +105,13 @@ class GitHandler(object):
         :return:
         """
         self.process_handler.clone_repo(self.cloned_repo_path)
-        self.repo = Repo(path=self.repo_url)
-        self.repo.clone(path=self.cloned_repo_path)
+
+        if self.remote:
+            self.repo = Repo.clone_from(url=self.repo_url, to_path=self.cloned_repo_path)
+        else:
+            self.repo = Repo(path=self.repo_url)
+            self.repo.clone(path=self.cloned_repo_path)
+
         self.commit_a = self.repo.commit(self.sha1_a)
         self.commit_b = self.repo.commit(self.sha1_b)
         return
