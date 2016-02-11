@@ -24,6 +24,7 @@ from lintable_settings.settings import LINTWEB_SETTINGS
 
 logger = logging.getLogger(__name__)
 
+
 class BaseModel(Model):
     class Meta:
         try:
@@ -87,6 +88,14 @@ class Jobs(BaseModel):
     end_time = DateTimeField(null=True)
     comment_number = IntegerField()
     status = CharField()
+
+
+class Report(BaseModel):
+    report_number = ForeignKeyField(Jobs, related_name='reports')
+    file_name = CharField()
+    column_number = IntegerField()
+    line_number = IntegerField()
+    error_message = CharField()
 
 
 class GithubString(BaseModel):
