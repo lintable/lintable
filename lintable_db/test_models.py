@@ -17,9 +17,13 @@ import unittest
 
 from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
+from uuid import uuid4
+from datetime import datetime
+import random
+import string
 
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import User, Repo, Jobs, GithubString
+from lintable_db.models import User, Repo, Jobs, GithubString, Report
 from lintable_settings.settings import LINTWEB_SETTINGS
 
 # create and initialize a local test database in memory
@@ -38,9 +42,18 @@ class ModelTests(unittest.TestCase):
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
         GithubString._meta.database = test_db
-        for i in [User, Jobs, Repo, GithubString]:
+        Report._meta.database = test_db
+
+        for i in [User, Jobs, Repo, GithubString, Report]:
             if not i.table_exists():
                 test_db.create_table(i)
+
+        self.user1 = User(token='dummyToken', github_id=1)
+        self.repo1 = Repo(repo_id=1, owner=self.user1,
+                          url='https://github.com/user/repo.git')
+        self.job1 = Jobs(job_id=uuid4(), repo_owner=self.user1, repo=self.repo1,
+                   start_time=datetime.now(), comment_number=1,
+                   status='pending')
 
     def test_encrypts_token(self):
         with test_database(test_db, ()):
@@ -112,7 +125,40 @@ class ModelTests(unittest.TestCase):
         # cleanup
         self.assertTrue(state.delete_instance() == 1)
 
+    def test_report(self):
+        # SUT
+        self.user1.save()
+        self.repo1.save()
+        self.job1.save()
 
+        # Exercise
+        report = Report(report_number=self.job1, file_name='file_a', column_number=10,
+                        line_number=15, error_message='V for vendetta')
+        report.save()
+        for report in self.job1.reports:
+            self.assertTrue(report.id == report.id)
+            self.assertEqual(report.line_number, 15)
+
+        # Cleanup
+        report.delete_instance()
+
+    def test_report_length(self):
+        # SUT
+        self.user1.save()
+        self.repo1.save()
+        self.job1.save()
+
+        # Exercise
+        comment_string = ''.join(random.choice(string.ascii_uppercase + string.digits) for a in range(1000000))
+        report = Report(report_number=self.job1, file_name='file_a', column_number=10,
+                        line_number=15, error_message=comment_string)
+        report.save()
+        fetched_report = Report.get(Report.line_number == 15)
+        self.assertEqual(fetched_report.file_name, report.file_name)
+        self.assertTrue(len(fetched_report.error_message) == 1000000)
+
+        # Cleanup
+        report.delete_instance()
 
 if __name__ == '__main__':
     unittest.main()
