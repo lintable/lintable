@@ -32,6 +32,7 @@ test_db = SqliteDatabase(':memory:')
 # just put the log messages into a file
 logging.basicConfig(filename='./model_tests.log', level=logging.DEBUG)
 
+
 class ModelTests(unittest.TestCase):
     def setUp(self):
         # Override our default encryption key.
@@ -52,8 +53,8 @@ class ModelTests(unittest.TestCase):
         self.repo1 = Repo(repo_id=1, owner=self.user1,
                           url='https://github.com/user/repo.git')
         self.job1 = Jobs(job_id=uuid4(), repo_owner=self.user1, repo=self.repo1,
-                   start_time=datetime.now(), comment_number=1,
-                   status='pending')
+                         start_time=datetime.now(), comment_number=1,
+                         status='pending')
 
     def test_encrypts_token(self):
         with test_database(test_db, ()):
@@ -117,7 +118,6 @@ class ModelTests(unittest.TestCase):
 
             user.delete_instance()
 
-
     def test_get_token_from_repo(self):
         # SUT
         user = User(github_id=23, token='dummyToken')
@@ -127,7 +127,7 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(user.get_oauth_token(), repo.get_oauth_token())
 
     def test_state(self):
-        #SUT
+        # SUT
         state = GithubString(state_string='state')
 
         # Exercise
@@ -143,7 +143,8 @@ class ModelTests(unittest.TestCase):
         self.job1.save()
 
         # Exercise
-        report = Report(report_number=self.job1, file_name='file_a', column_number=10,
+        report = Report(report_number=self.job1, file_name='file_a',
+                        column_number=10,
                         line_number=15, error_message='V for vendetta')
         report.save()
         for report in self.job1.reports:
@@ -160,8 +161,11 @@ class ModelTests(unittest.TestCase):
         self.job1.save()
 
         # Exercise
-        comment_string = ''.join(random.choice(string.ascii_uppercase + string.digits) for a in range(1000000))
-        report = Report(report_number=self.job1, file_name='file_a', column_number=10,
+        comment_string = ''.join(
+            random.choice(string.ascii_uppercase + string.digits) for a in
+            range(1000000))
+        report = Report(report_number=self.job1, file_name='file_a',
+                        column_number=10,
                         line_number=15, error_message=comment_string)
         report.save()
         fetched_report = Report.get(Report.line_number == 15)
@@ -170,6 +174,7 @@ class ModelTests(unittest.TestCase):
 
         # Cleanup
         report.delete_instance()
+
 
 if __name__ == '__main__':
     unittest.main()
