@@ -18,30 +18,49 @@ import os
 from typing import List
 from uuid import uuid4
 
+from lintable_db.database import DatabaseHandler
+from lintable_db.models import User
 from lintable_git.git_handler import GitHandler
 from lintable_lintball.lint_error import LintError
 from lintable_lintball.lint_report import LintReport
 from lintable_lintball.lint_wrapper import LintWrapper
 from lintable_lintball.runner import runner
 from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
+from lintable_processes.db_handler import DBHandler
 from lintable_processes.log_handler import LogHandler
 from lintable_processes.process_handler import ProcessHandler
 
 
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):
+    logger = logging.getLogger()
 
     if payload['action'] != 'opened' and payload['action'] != 'synchronized':
         return
 
-    repo_url = 'https://github.com/{full_name}.git'.format(
+    github_id = payload['repository']['owner']['id']
+
+    owner = DatabaseHandler.get_user(github_id)
+
+    oauth_key = owner.get_oauth_token() if isinstance(owner, User) else None
+
+    if oauth_key is None:
+        logger.error('Unable to locate oauth_token for {user} with id of {id}'.format(user=owner, id=github_id))
+        return
+
+    repo_url = 'https://{oauth_key}github.com/{full_name}.git'.format(
+        oauth_key=oauth_key,
         full_name=payload['repository']['full_name'])
 
     sha1_a = payload['pull_request']['head']['sha']
     sha1_b = payload['pull_request']['base']['sha']
 
-    process_handler = ProcessHandler(repo=repo_url, uuid=task_id,
-                                     logger=LogHandler(logging.getLogger()))
+    repo_id = payload['pull_request']['repository']['id']
+
+    process_handler = ProcessHandler(repo=repo_url,
+                                     uuid=task_id,
+                                     logger=LogHandler(logger),
+                                     db=DBHandler(repo_id=repo_id))
 
     git_handler = GitHandler(process_handler=process_handler,
                              repo_url=repo_url,
