@@ -18,7 +18,10 @@ import json
 import logging
 import os
 from typing import List
+from urllib.parse import urljoin
 from uuid import uuid4
+
+import github
 
 from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, Repo
@@ -31,9 +34,12 @@ from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
 from lintable_processes.db_handler import DBHandler
 from lintable_processes.log_handler import LogHandler
 from lintable_processes.process_handler import ProcessHandler
+from lintable_processes.status_handler import StatusHandler
+from lintable_settings.settings import LINTWEB_SETTINGS
+
 
 @runner.task(serializer='json')
-def lint_github(payload: json, task_id=uuid4()):
+def lint_github(payload: json, target_url: str, task_id=uuid4()):
     """Receive a task to lint a Github repo."""
 
     logger = logging.getLogger()
@@ -53,22 +59,44 @@ def lint_github(payload: json, task_id=uuid4()):
         logger.error('Unable to locate oauth_token for {user} with id of {id}'.format(user=owner, id=github_id))
         return
 
-
+    full_name = payload['repository']['full_name']
     repo_url = 'https://{oauth_key}@github.com/{full_name}.git'.format(
         oauth_key=oauth_key,
-        full_name=payload['repository']['full_name'])
+        full_name=full_name)
 
     sha1_a = payload['pull_request']['head']['sha']
     sha1_b = payload['pull_request']['base']['sha']
 
-    repo_id = payload['repository']['id']
+    repo_id = payload['repository']['id']  # type: int
+
     if DatabaseHandler.get_repo(repo_id) is None:
         repo = Repo(repo_id=repo_id, owner=owner,
                     url=payload['repository']['clone_url'])
         repo.save()
 
+    target_url = target_url + '/'
+    target_url = urljoin(target_url, str(task_id))
+
+    client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
+    client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
+
+    github_api = github.Github(login_or_token=oauth_key, client_id=client_id,
+                               client_secret=client_secret)
+
+    logger.error('getting repo for {full_name}'.format(full_name=full_name))
+
+    github_repo = github_api.get_repo(full_name_or_id=full_name, lazy=False)
+
+    logger.error('repo: {repo}'.format(repo=github_repo.id))
+
+    github_commit = github_repo.get_commit(sha1_a)
+
+
+    logger.error('target_url for status: {target_url}'.format(target_url=target_url))
+
     process_handler = ProcessHandler(repo=repo_url,
                                      uuid=task_id,
+                                     status_handler=StatusHandler(github_commit=github_commit, target_url=target_url),
                                      logger=LogHandler(logger),
                                      db=DBHandler(repo_id=repo_id))
 

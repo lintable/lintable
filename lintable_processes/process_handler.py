@@ -30,12 +30,12 @@ class ProcessHandler(object):
     """
 
     def __init__(self, uuid: UUID, repo: Repo, logger=DoNothingHandler(),
-                 commenter=DoNothingHandler(), db=DoNothingHandler()):
+                 status_handler=DoNothingHandler(), db=DoNothingHandler()):
         self.state = ProcessState.STARTED
         self.uuid = uuid
         self.repo = repo
         self.logger = logger
-        self.commenter = commenter
+        self.status_updater = status_handler
         self.db = db
         self.a_commit = None
         self.b_commit = None
@@ -49,7 +49,7 @@ class ProcessHandler(object):
         :return:
         """
 
-        self.comment_id = self.commenter.started(uuid=self.uuid)
+        self.comment_id = self.status_updater.started(uuid=self.uuid)
         self.logger.started(uuid=self.uuid, comment_id=self.comment_id)
         self.db.started(uuid=self.uuid, comment_id=self.comment_id)
 
@@ -63,7 +63,7 @@ class ProcessHandler(object):
         self.state = ProcessState.CLONE_REPO
         self.local_path = local_path
         self.logger.clone_repo(self.uuid, self.repo, local_path)
-        self.commenter.clone_repo(self.uuid, self.repo, local_path)
+        self.status_updater.clone_repo(self.uuid, self.repo, local_path)
         self.db.clone_repo(self.uuid, self.repo, local_path)
         return
 
@@ -79,7 +79,7 @@ class ProcessHandler(object):
         self.a_commit = a_commit
         self.b_commit = b_commit
         self.logger.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
-        self.commenter.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
+        self.status_updater.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
         self.db.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
         return
 
@@ -94,7 +94,7 @@ class ProcessHandler(object):
         # track which files we have retrieved
         self.files.append(file)
         self.logger.retrieve_file_from_commit(self.uuid, file, commit)
-        self.commenter.retrieve_file_from_commit(self.uuid, file, commit)
+        self.status_updater.retrieve_file_from_commit(self.uuid, file, commit)
         self.db.retrieve_file_from_commit(self.uuid, file, commit)
         return
 
@@ -108,7 +108,7 @@ class ProcessHandler(object):
 
         self.state = ProcessState.LINT_FILES
         self.logger.lint_file(self.uuid, linter, file)
-        self.commenter.lint_file(self.uuid, linter, file)
+        self.status_updater.lint_file(self.uuid, linter, file)
         self.db.lint_file(self.uuid, linter, file)
         return
 
@@ -121,7 +121,7 @@ class ProcessHandler(object):
 
         self.state = ProcessState.REPORT
         self.logger.report(self.uuid, report)
-        self.commenter.report(self.uuid, report)
+        self.status_updater.report(self.uuid, report)
         self.db.report(self.uuid, report)
         return
 
@@ -133,6 +133,6 @@ class ProcessHandler(object):
 
         self.state = ProcessState.FINISHED
         self.logger.finish(self.uuid)
-        self.commenter.finish(self.uuid)
+        self.status_updater.finish(self.uuid)
         self.db.finish(self.uuid)
         return
