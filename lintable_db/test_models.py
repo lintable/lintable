@@ -107,6 +107,17 @@ class ModelTests(unittest.TestCase):
             # Clean up
             user.delete_instance()
 
+    def test_token_type(self):
+        with test_database(test_db, ()):
+            self.assertTrue(self.user1.token.__class__ == str)
+            self.user1.save()
+            self.assertFalse(self.user1.token.__class__ == str)
+            user = User.get(User.id == self.user1.id)
+            self.assertFalse(user.token.__class__ == str)
+
+            user.delete_instance()
+
+
     def test_get_token_from_repo(self):
         # SUT
         user = User(github_id=23, token='dummyToken')
