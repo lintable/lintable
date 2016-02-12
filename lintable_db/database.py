@@ -14,7 +14,7 @@
 
 import logging
 from typing import Union
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from lintable_db.models import User, Repo, Jobs
 
@@ -27,14 +27,14 @@ class DatabaseHandler:
         """
         Finds a repo for a given URL
 
-        :param url:
+        :param identifier:
         :return Repo or None:
         """
         try:
             if isinstance(identifier, int):
-                user = Repo.get(Repo.repo_id == identifier)
+                repo = Repo.get(Repo.repo_id == identifier)
             if isinstance(identifier, str):
-                user = Repo.get(Repo.url == identifier)
+                repo = Repo.get(Repo.url == identifier)
         except Repo.DoesNotExist as e:
             repo = None
             logger.error(
@@ -92,7 +92,8 @@ class DatabaseHandler:
             success = None
         return success
 
-    def get_job(self, identifier: uuid4) -> Jobs:
+    @staticmethod
+    def get_job(identifier: UUID) -> Jobs:
         """
         Finds a job for a given job ID.
 
