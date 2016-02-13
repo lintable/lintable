@@ -21,6 +21,7 @@ from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
 from uuid import uuid4
 from datetime import datetime
+from cryptography.fernet import Fernet
 import random
 import string
 
@@ -40,7 +41,7 @@ class ModelTests(unittest.TestCase):
 
     def setUp(self):
         # Override our default encryption key.
-        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
+        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = Fernet.generate_key()
 
         self.db = DatabaseHandler()
         User._meta.database = test_db
