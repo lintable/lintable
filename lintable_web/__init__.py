@@ -204,7 +204,8 @@ if not DEBUG:
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
 
-        if DatabaseHandler.get_user(github_user_id) is None:
+        user = DatabaseHandler.get_user(github_user_id)
+        if user is None:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
 
