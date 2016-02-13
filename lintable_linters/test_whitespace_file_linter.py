@@ -1,3 +1,5 @@
+"""Tests for the WhitespaceFileLinter."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,15 +20,21 @@ from lintable_lintball.lint_error import LintError
 from lintable_linters.whitespace_file_linter import WhitespaceFileLinter
 
 class DetectTrailingWhitespaceTestCase(unittest.TestCase):
+    """Tests for the WhitespaceFileLinter."""
+
     def setUp(self):
         self.linter = WhitespaceFileLinter()
 
     def test_empty_string(self):
+        """Make sure an empty string has no trailing whitespace."""
+
         test_string = ""
         self.assertEqual(self.linter.has_trailing_whitespace(1, test_string),
                          None)
 
     def test_tab_only(self):
+        """Make sure a string that's just a tab has trailing whitespace."""
+
         test_string = '\t'
         lint_error = LintError(line_number=1,
                                column=1,  # Magic number!
@@ -36,6 +44,8 @@ class DetectTrailingWhitespaceTestCase(unittest.TestCase):
                          lint_error)
 
     def test_space_only(self):
+        """Make sure a string that's just a space has trailing whitespace."""
+
         test_string = " "
         lint_error = LintError(line_number=1,
                                column=1,  # Magic number!
@@ -45,12 +55,16 @@ class DetectTrailingWhitespaceTestCase(unittest.TestCase):
                          lint_error)
 
     def test_no_trailing_whitespace_empty_list(self):
+        """Make sure a no-trailing string has no trailing whitespace."""
+
         test_string = "This is a test string with no whitespace."
 
         self.assertEqual(self.linter.has_trailing_whitespace(1, test_string),
                          None)
 
     def test_trailing_whitespace_lint_error(self):
+        """Make sure a trailing string has trailing whitespace."""
+
         test_string = "This is a test string with whitespace.  \r\n"
 
         lint_error = LintError(line_number=1,

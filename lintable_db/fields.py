@@ -1,3 +1,5 @@
+"""Provides custom fields to interface with the database."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +17,8 @@
 from peewee import CharField
 
 class OauthField(CharField):
+    """A field for OAuth tokens."""
+
     def db_value(self, value):
         return value
 

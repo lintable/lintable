@@ -1,3 +1,5 @@
+"""Provides models for interfacing with the database."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +28,11 @@ logger = logging.getLogger(__name__)
 
 
 class BaseModel(Model):
+    """Elements that apply to all our models."""
+
     class Meta:
+        """Database access settings for all our models."""
+
         try:
             db_url = urlparse(LINTWEB_SETTINGS['peewee']['DATABASE_URL'])
             database = PostgresqlDatabase(
@@ -40,13 +46,15 @@ class BaseModel(Model):
 
 
 class User(BaseModel):
+    """A user of the website, with repos/tokens."""
+
     id = PrimaryKeyField()
     github_id = IntegerField(unique=True)
     username = CharField(null=True)
     token = OauthField()
 
     def get_oauth_token(self) -> str:
-        """
+        """Return the OAuth token for a user.
 
         :return decrypted oauth token as a string:
         """
@@ -54,6 +62,8 @@ class User(BaseModel):
                        self.token).decode('utf8')
 
     def save(self, *args, **kwargs):
+        """Override the default save method for a Model."""
+
         if self.token.__class__ == str:
             try:
                 self.token = encrypt(
@@ -67,21 +77,25 @@ class User(BaseModel):
 
 
 class Repo(BaseModel):
+    """A repo, with URL and id."""
+
     id = PrimaryKeyField()
     repo_id = IntegerField(unique=True)
     owner = ForeignKeyField(User, related_name='repos')
     url = CharField()
 
     def get_oauth_token(self) -> str:
-        """
-        Get the unencrypted OAuth token for the owner of this repo
+        """Get the unencrypted OAuth token for the owner of this repo
 
         :return decrypted oauth token as a string:
         """
+
         return self.owner.get_oauth_token()
 
 
 class Jobs(BaseModel):
+    """A linting job, currently running or already done."""
+
     job_id = UUIDField(unique=True)
     repo_owner = ForeignKeyField(User, related_name='jobs')
     repo = ForeignKeyField(Repo)
@@ -92,6 +106,8 @@ class Jobs(BaseModel):
 
 
 class Report(BaseModel):
+    """A linting results report."""
+
     report_number = ForeignKeyField(Jobs, related_name='reports')
     file_name = CharField()
     column_number = IntegerField()
@@ -100,4 +116,6 @@ class Report(BaseModel):
 
 
 class GithubString(BaseModel):
+    """A test state placeholder."""
+
     state_string = CharField()

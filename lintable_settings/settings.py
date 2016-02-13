@@ -1,3 +1,5 @@
+"""Settings dictionaries for the different modules."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +16,7 @@
 
 import os
 
-"""
-Settings dictionary for lintweb.
-"""
-
+#: Settings dictionary for lintweb.
 LINTWEB_SETTINGS = {
     'peewee': {
         'DATABASE_URL': os.environ.get('DATABASE_URL', 'postgres://user@localhost:5432/postgres')
@@ -36,10 +35,7 @@ LINTWEB_SETTINGS = {
     'DEBUG' : os.environ.get('DEBUG', True)
 }
 
-"""
-Settings dictionary for lintball.
-"""
-
+#: Settings dictionary for lintball.
 LINTBALL_SETTINGS = {
     'celery': {
         'broker': os.environ.get('CELERY_BROKER', 'amqp://'),
