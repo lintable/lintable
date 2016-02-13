@@ -39,7 +39,7 @@ def lint_github(payload: json, task_id=uuid4()):
 
     logger = logging.getLogger()
 
-    if payload['action'] != 'opened' and payload['action'] != 'synchronized':
+    if payload['action'] != 'opened' and payload['action'] != 'synchronize':
         return
 
     github_id = payload['repository']['owner']['id']
