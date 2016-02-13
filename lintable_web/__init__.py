@@ -20,7 +20,10 @@ import urllib.parse
 from datetime import datetime
 
 import requests
-from flask import Flask, request, render_template, redirect, url_for, session, abort
+from flask import (Flask, request, render_template, redirect, url_for, session,
+                   abort, flash)
+from flask_login import (LoginManager, login_user, login_required, logout_user,
+                         current_user)
 from github import Github
 
 from lintable_db.database import DatabaseHandler
@@ -28,12 +31,27 @@ from lintable_db.models import User
 from lintable_settings.settings import LINTWEB_SETTINGS
 
 app = Flask(__name__) # pylint: disable=invalid-name
+app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
+
+login_manager = LoginManager()
+login_manager.login_view = 'github_oauth'
+login_manager.init_app(app)
 
 LOGGER = logging.getLogger(__name__)
 DEBUG = LINTWEB_SETTINGS['DEBUG']
 
 ################################################################################
-# Define views
+# Authentication helpers
+################################################################################
+
+@login_manager.user_loader
+def load_user(identifier: str) -> User:
+    """Return a User object based on the given identifier."""
+
+    return DatabaseHandler.get_user(int(identifier))
+
+################################################################################
+# Views
 ################################################################################
 
 @app.route('/')
@@ -48,20 +66,9 @@ def index():
 
 if not DEBUG:
     @app.route('/account', methods=['GET', 'POST'])
-    @app.route('/account/<identifier>', methods=['GET', 'POST'])
-    def account(identifier=None):
+    @login_required
+    def account():
         """View details for an existing user account."""
-
-        if not session.get('logged_in') or not session.get('user_id'):
-            abort(401)
-
-        # In the future, we can extend this to an admin viewing any user.
-        if session['user_id'] != identifier:
-            abort(401)
-
-        user = DatabaseHandler.get_user(session['user_id'])
-        if user is None:
-            abort(401)
 
         if request.method == 'POST':
             new_repo = request.form['repo-url-new']
@@ -75,43 +82,38 @@ if not DEBUG:
                 repo_id_to_delete = submit_value[12:]
                 # TODO: Delete repo here.
 
-        return render_template('account.html',
-                               user=user,
-                               repos=user.repos)
+        return render_template('account.html')
 
     @app.route('/status')
     @app.route('/status/<identifier>')
+    @login_required
     def status(identifier=None):
-        """Get a list of active jobs, or get the status of a job in progress.
+        """Get active jobs for the current user, or status of a job in progress.
 
         :param identifier: A UUID identifying the job.
         """
 
-        if identifier is not None:
-            job = DatabaseHandler.get_job(identifier)
-            if job is None:
-                abort(404)
+        if identifier is None:
+            return render_template('status.html')
 
-            if job.end_time is None:
-                currently_running = True
-                duration = datetime.now() - job.start_time
-            else:
-                currently_running = False
-                duration = job.end_time - job.start_time
+        job = DatabaseHandler.get_job(identifier)
+        if job is None:
+            abort(404)
 
-            return render_template('status.html',
-                                   job=job,
-                                   currently_running=currently_running,
-                                   duration=duration)
+        if job.user is not current_user:
+            abort(403)
+
+        if job.end_time is None:
+            currently_running = True
+            duration = datetime.now() - job.start_time
         else:
-            if not session.get('user_id'):
-                abort(401)
+            currently_running = False
+            duration = job.end_time - job.start_time
 
-            user = DatabaseHandler.get_user(session['user_id'])
-            if user is None:
-                abort(401)
-
-            return render_template('status.html', user=user)
+        return render_template('status.html',
+                               job=job,
+                               currently_running=currently_running,
+                               duration=duration)
 
     @app.route('/terms')
     def terms():
@@ -148,6 +150,10 @@ if not DEBUG:
         # lintball.lint_github.delay(payload=payload)
         return
 
+    @app.route('/login')
+    def login():
+        return redirect(url_for('github_oauth'))
+
     @app.route('/register')
     def github_oauth():
         """Redirect user to github OAuth registeration page."""
@@ -163,6 +169,12 @@ if not DEBUG:
         url = '{}?{}'.format(url, params_str)
 
         return redirect(url, code=302)
+
+    @app.route('/logout')
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for('index'))
 
     @app.route('/callback')
     def github_oauth_response():
@@ -198,7 +210,8 @@ if not DEBUG:
         scope_needed = LINTWEB_SETTINGS['github']['SCOPES'].split(',')
         for perm in scope_needed:
             if perm not in scope_given:
-                return 'You did not accept our permissions.'
+                flash('You did not accept our permissions.')
+                return redirect(url_for('index'))
 
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
@@ -207,10 +220,10 @@ if not DEBUG:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
 
-        # Save to active session to stay logged in.
-        session['user_id'] = user.id
+        login_user(user)
 
-        return redirect(url_for('account'))
+        flash('Logged in successfully.')
+        return redirect(request.args.get('next') or url_for('account'))
 
 ################################################################################
 # Start the server

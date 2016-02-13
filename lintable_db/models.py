@@ -16,7 +16,8 @@ import logging
 from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
-                    DateTimeField, CharField, PostgresqlDatabase, UUIDField)
+                    DateTimeField, CharField, UUIDField, BooleanField,
+                    PostgresqlDatabase)
 from simplecrypt import decrypt, encrypt
 
 from lintable_db.fields import OauthField
@@ -44,6 +45,29 @@ class User(BaseModel):
     github_id = IntegerField(unique=True)
     username = CharField(null=True)
     token = OauthField()
+
+    @property
+    def is_authenticated(self):
+        """Is the user authenticated? Always true for our User objects."""
+
+        return True
+
+    @property
+    def is_active(self):
+        """Is this user active? Always true because we don't disable users."""
+
+        return True
+
+    @property
+    def is_anonymous(self):
+        """Is the user anonymous? Always false because we don't have anons."""
+
+        return False
+
+    def get_id(self) -> str:
+        """Returns the user id as a string."""
+
+        return str(self.id)
 
     def get_oauth_token(self) -> str:
         """

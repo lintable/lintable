@@ -31,22 +31,38 @@ limitations under the License.
       <div class="container">
         <a class="navbar-brand" href="/">Lintable</a>
         <ul class="nav navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link" href="/status">Status</a>
-          </li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/status">Status</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/account">Account</a>
+            </li>
+          {% endif %}
         </ul>
         <ul class="nav navbar-nav pull-xs-right">
-          <li class="nav-item">
-            <a class="nav-link" href="/register">Register</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/register"><span class="octicon octicon-octoface"></span> Log In</a>
-          </li>
+          {% if current_user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Log Out</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/register"><span class="octicon octicon-octoface"></span> Register</a>
+            </li>
+          {% endif %}
         </ul>
       </div>
     </nav>
 
     <div class="container">
+      {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+          <div class="alert alert-info" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endwith %}
+
       <h1 class="display-4 m-t-2 m-b-1">
         {% block pagetitle %}Lintable{% endblock %}
       </h1>

@@ -17,7 +17,7 @@ limitations under the License.
 {% extends "_wrapper.html" %}
 
 {% block headtitle %}Lintable | Account{% endblock %}
-{% block pagetitle %}Account: {{ user.username }}{% endblock %}
+{% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
 {% block content %}
   <form method="post">
@@ -31,13 +31,13 @@ limitations under the License.
           <input type="text" class="form-control"
             id="user-token"
             name="user-token"
-            value="{{ user.get_oauth_token() }}"
+            value="{{ current_user.get_oauth_token() }}"
             placeholder="Token goes here">
         </fieldset>
       </div>
     </div>
 
-    {% for repo in repos %}
+    {% for repo in current_user.repos %}
       <div class="card">
         <div class="card-header">
           <a href="{{ repo.url }}">{{ repo.url }}</a>

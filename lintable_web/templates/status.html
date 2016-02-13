@@ -40,7 +40,7 @@ limitations under the License.
         </tr>
       </thead>
       <tbody>
-        {% for job in user.jobs %}
+        {% for job in current_user.jobs %}
           <tr>
             <td class="text-xs-center"><a class="btn btn-info btn-sm" href="/status/{{ job.job_id }}"><span class="octicon octicon-sync"></span>  {{ job.job_id }}</a></td>
             <td></td>
