@@ -17,36 +17,12 @@ limitations under the License.
 {% extends "_wrapper.html" %}
 
 {% block headtitle %}Lintable | Account{% endblock %}
-{% block pagetitle %}Account: {{ username }}{% endblock %}
+{% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
 {% block content %}
-  {% for repo in repos %}
-    <div class="card">
-      <div class="card-header">
-        <a href="{{ repo.url }}">{{ repo.url }}</a>
-
-        <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
-      </div>
-      <div class="card-block">
-        <form>
-          <fieldset class="form-group">
-            <label for="repo-token-{{ repo.url|e }}">Repo URL</label>
-            <input type="text" class="form-control"
-              id="repo-token-{{ repo.url|e }}"
-              value="{{ repo.url }}"
-              placeholder="http://...">
-          </fieldset>
-          <fieldset class="form-group">
-            <label for="repo-token-{{ repo.url|e }}">Private Token</label>
-            <input type="text" class="form-control"
-              id="repo-token-{{ repo.url|e }}"
-              value="{{ repo.token }}"
-              placeholder="Private token goes here">
-          </fieldset>
-        </form>
-      </div>
-    </div>
+  {% for repo in current_user.repos %}
+    <ul class="list-group">
+      <li class="list-group-item"><a href="{{ repo.url }}">{{ repo.url }}</a></li>
+    </ul>
   {% endfor %}
-
-  <p><a class="btn btn-primary" href="#"><span class="octicon octicon-plus"></span> Add Repo</a></p>
 {% endblock %}

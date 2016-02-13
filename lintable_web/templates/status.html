@@ -16,18 +16,18 @@ limitations under the License.
 
 {% extends "_wrapper.html" %}
 
-{% block headtitle %}Lintable | Status {% if identifier %}for job {{ identifier|e }}{% endif %}{% endblock %}
+{% block headtitle %}Lintable | Status {% if job %}for job {{ job.job_id|e }}{% endif %}{% endblock %}
 
 {% block pagetitle %}
   Status
-  {% if identifier %}
-    for job {{ identifier|e }}
+  {% if job %}
+    for job {{ job.job_id|e }}
     <small><a class="btn btn-info btn-sm" href="/status"><span class="octicon octicon-triangle-up"></span></a></small>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if not identifier %}
+  {% if not job %}
     <p class="lead">You currently have these jobs active.</p>
 
     <table class="table table-striped">
@@ -40,37 +40,37 @@ limitations under the License.
         </tr>
       </thead>
       <tbody>
-        {% for number in range(9) %}
+        {% for job in current_user.jobs %}
           <tr>
-            <td class="text-xs-center"><a class="btn btn-info btn-sm" href="/status/{{ number }}"><span class="octicon octicon-sync"></span>  {{ number }}</a></td>
-            <td>3 hours (in progress)</td>
-            <td><a href="#">https://github.com/reponame/repo</a></td>
-            <td><code>10{{ number }}dcac</code></td>
+            <td class="text-xs-center"><a class="btn btn-info btn-sm" href="/status/{{ job.job_id }}"><span class="octicon octicon-sync"></span>  {{ job.job_id }}</a></td>
+            <td></td>
+            <td><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></td>
+            <td><code></code></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% endif %}
 
-  {% if identifier %}
+  {% if job %}
     <p class="lead">
       This job is
       {% if currently_running %}
-        <b>currently running</b>. It's been running for <b>{{ duration }}</b>.
+        <b>currently running</b>. It's been running for <b>{{ duration.seconds }} seconds</b>.
       {% else %}
-        <b>finished</b>. It took <b>{{ duration }}</b>.
+        <b>finished</b>. It took <b>{{ duration.seconds }} seconds</b>.
       {% endif %}
     </p>
 
     <dl>
       <dt>Job ID</dt>
-      <dd>{{ identifier }}</dd>
+      <dd>{{ job.job_id }}</dd>
 
       <dt>Repo</dt>
-      <dd><a href="{{ job_url }}">{{ job_url }}</a></dd>
+      <dd><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></dd>
 
       <dt>Status</dt>
-      <dd>{{ job_status }}</dd>
+      <dd>{{ job.status }}</dd>
     </dl>
 
     <p><a href="#" class="btn btn-danger">Cancel Job</a></p>

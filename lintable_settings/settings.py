@@ -32,7 +32,8 @@ LINTWEB_SETTINGS = {
         'OAUTH_URL_POST': os.environ.get('LINTWEB_OAUTH_URL_POST', 'https://github.com/login/oauth/access_token'),
         'SCOPES': os.environ.get('LINTWEB_SCOPES', 'repo')
     },
-    'DEBUG' : os.environ.get('DEBUG', True)
+    'DEBUG' : os.environ.get('DEBUG', True),
+    'SESSIONS_SECRET': os.environ.get('LINTWEB_SESSIONS_SECRET', '')
 }
 
 #: Settings dictionary for lintball.

@@ -17,10 +17,13 @@
 import json
 import logging
 import urllib.parse
+from datetime import datetime
 
 import requests
-# from datetime import datetime
-from flask import Flask, request, render_template, redirect, url_for
+from flask import (Flask, request, render_template, redirect, url_for, session,
+                   abort, flash)
+from flask_login import (LoginManager, login_user, login_required, logout_user,
+                         current_user)
 from github import Github
 
 from lintable_db.database import DatabaseHandler
@@ -28,12 +31,27 @@ from lintable_db.models import User
 from lintable_settings.settings import LINTWEB_SETTINGS
 
 app = Flask(__name__) # pylint: disable=invalid-name
+app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
+
+login_manager = LoginManager()
+login_manager.login_view = 'github_oauth'
+login_manager.init_app(app)
 
 LOGGER = logging.getLogger(__name__)
 DEBUG = LINTWEB_SETTINGS['DEBUG']
 
 ################################################################################
-# Define views
+# Authentication helpers
+################################################################################
+
+@login_manager.user_loader
+def load_user(identifier: str) -> User:
+    """Return a User object based on the given identifier."""
+
+    return DatabaseHandler.get_user(int(identifier))
+
+################################################################################
+# Views
 ################################################################################
 
 @app.route('/')
@@ -48,65 +66,42 @@ def index():
 
 if not DEBUG:
     @app.route('/account')
-    @app.route('/account/<identifier>')
-    def account(identifier=None):
+    @login_required
+    def account():
         """View details for an existing user account."""
 
-        # TODO: Use logged in cookies to get user automatically
-        # TODO: Only allowing viewing a user page for a logged in user
-        #       (in the future we can extend this to an admin viewing any user)
-        if identifier is not None:
-            # user = DatabaseHandler.get_user(identifier)
-            # if user is not None:
-            #     repos = user.repos
-            # else:
-            #     repos = None
-            return render_template('account.html')
-            # return render_template('account.html',
-            #                        username=user.username,
-            #                        repos=repos)
-        else:
-            # user = None
-            return render_template('account.html')
-
-
-    @app.route('/login')
-    def login():
-        """Log into an account, or trigger OAuth with a new account."""
-
-        # TODO: Wire this into OAuth
-        return render_template('login.html')
-
+        return render_template('account.html')
 
     @app.route('/status')
     @app.route('/status/<identifier>')
+    @login_required
     def status(identifier=None):
-        """Get a list of active jobs, or get the status of a job in progress."""
+        """Get active jobs for the current user, or status of a job in progress.
 
-        if identifier is not None:
-            # job = DatabaseHandler.get_job(identifier)
-            # if not job.endTime:
-            #     currently_running = True
-            #     duration = datetime.now() - job.startTime
-            # else:
-            #     currently_running = False
-            #     duration = job.endTime - job.startTime
+        :param identifier: A UUID identifying the job.
+        """
 
+        if identifier is None:
             return render_template('status.html')
-            # return render_template('status.html',
-            #                        identifier=job.job_id,
-            #                        repo_url=job.url,
-            #                        currently_running=currently_running,
-            #                        duration=duration,
-            #                        status=job.status)
+
+        job = DatabaseHandler.get_job(identifier)
+        if job is None:
+            abort(404)
+
+        if job.user is not current_user:
+            abort(403)
+
+        if job.end_time is None:
+            currently_running = True
+            duration = datetime.now() - job.start_time
         else:
-            # TODO: Use logged in cookies to get jobs for user
-            # user_id = cookie.get_id()
-            # user = DatabaseHandler.get_user(user_id)
-            # if user is not None:
-            #   jobs = user.jobs
-            return render_template('status.html')
+            currently_running = False
+            duration = job.end_time - job.start_time
 
+        return render_template('status.html',
+                               job=job,
+                               currently_running=currently_running,
+                               duration=duration)
 
     @app.route('/terms')
     def terms():
@@ -143,6 +138,9 @@ if not DEBUG:
         # lintball.lint_github.delay(payload=payload)
         return
 
+    @app.route('/login')
+    def login():
+        return redirect(url_for('github_oauth'))
 
     @app.route('/register')
     def github_oauth():
@@ -160,6 +158,11 @@ if not DEBUG:
 
         return redirect(url, code=302)
 
+    @app.route('/logout')
+    @login_required
+    def logout():
+        logout_user()
+        return redirect(url_for('index'))
 
     @app.route('/callback')
     def github_oauth_response():
@@ -195,7 +198,8 @@ if not DEBUG:
         scope_needed = LINTWEB_SETTINGS['github']['SCOPES'].split(',')
         for perm in scope_needed:
             if perm not in scope_given:
-                return 'You did not accept our permissions.'
+                flash('You did not accept our permissions.')
+                return redirect(url_for('index'))
 
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
@@ -204,7 +208,10 @@ if not DEBUG:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
 
-        return redirect(url_for('account'))
+        login_user(user)
+
+        flash('Logged in successfully.')
+        return redirect(request.args.get('next') or url_for('account'))
 
 ################################################################################
 # Start the server

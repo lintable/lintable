@@ -19,4 +19,5 @@ simple-crypt==4.1.7
 PyGithub==1.26.0
 click==6.2
 rstr==2.2.3
+flask-login==0.3.2
 cryptography==1.2.2
