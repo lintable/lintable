@@ -17,36 +17,52 @@ limitations under the License.
 {% extends "_wrapper.html" %}
 
 {% block headtitle %}Lintable | Account{% endblock %}
-{% block pagetitle %}Account: {{ username }}{% endblock %}
+{% block pagetitle %}Account: {{ user.username }}{% endblock %}
 
 {% block content %}
-  {% for repo in repos %}
+  <form method="post">
     <div class="card">
       <div class="card-header">
-        <a href="{{ repo.url }}">{{ repo.url }}</a>
-
-        <a class="btn btn-sm btn-danger pull-xs-right" href="#">Delete</a>
+        Account Settings
       </div>
       <div class="card-block">
-        <form>
-          <fieldset class="form-group">
-            <label for="repo-token-{{ repo.url|e }}">Repo URL</label>
-            <input type="text" class="form-control"
-              id="repo-token-{{ repo.url|e }}"
-              value="{{ repo.url }}"
-              placeholder="http://...">
-          </fieldset>
-          <fieldset class="form-group">
-            <label for="repo-token-{{ repo.url|e }}">Private Token</label>
-            <input type="text" class="form-control"
-              id="repo-token-{{ repo.url|e }}"
-              value="{{ repo.token }}"
-              placeholder="Private token goes here">
-          </fieldset>
-        </form>
+        <fieldset class="form-group">
+          <label for="user-token">OAuth Token</label>
+          <input type="text" class="form-control"
+            id="user-token"
+            name="user-token"
+            value="{{ user.get_oauth_token() }}"
+            placeholder="Token goes here">
+        </fieldset>
       </div>
     </div>
-  {% endfor %}
 
-  <p><a class="btn btn-primary" href="#"><span class="octicon octicon-plus"></span> Add Repo</a></p>
+    {% for repo in repos %}
+      <div class="card">
+        <div class="card-header">
+          <a href="{{ repo.url }}">{{ repo.url }}</a>
+
+          <button class="btn btn-sm btn-danger pull-xs-right" type="submit" value="delete-repo-{{ repo.repo_id }}">Delete</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          New Repo
+        </div>
+        <div class="card-block">
+          <fieldset class="form-group">
+            <label for="repo-url-new">Repo URL</label>
+            <input type="text" class="form-control"
+              id="repo-url-new"
+              name="repo-url-new"
+              value=""
+              placeholder="http://...">
+          </fieldset>
+        </div>
+      </div>
+    {% endfor %}
+
+    <p><button type="submit" value="save" class="btn btn-primary" href="#">Save Changes</button></p>
+  </form>
 {% endblock %}

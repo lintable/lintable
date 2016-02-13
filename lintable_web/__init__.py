@@ -20,7 +20,7 @@ import urllib.parse
 
 import requests
 # from datetime import datetime
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, session, abort
 from github import Github
 
 from lintable_db.database import DatabaseHandler
@@ -47,66 +47,71 @@ def index():
         return render_template('index.html')
 
 if not DEBUG:
-    @app.route('/account')
-    @app.route('/account/<identifier>')
+    @app.route('/account', methods=['GET', 'POST'])
+    @app.route('/account/<identifier>', methods=['GET', 'POST'])
     def account(identifier=None):
         """View details for an existing user account."""
 
-        # TODO: Use logged in cookies to get user automatically
-        # TODO: Only allowing viewing a user page for a logged in user
-        #       (in the future we can extend this to an admin viewing any user)
-        if identifier is not None:
-            # user = DatabaseHandler.get_user(identifier)
-            # if user is not None:
-            #     repos = user.repos
-            # else:
-            #     repos = None
-            return render_template('account.html')
-            # return render_template('account.html',
-            #                        username=user.username,
-            #                        repos=repos)
-        else:
-            # user = None
-            return render_template('account.html')
+        if not session.get('logged_in') or not session.get('user_id'):
+            abort(401)
 
+        # In the future, we can extend this to an admin viewing any user.
+        if session['user_id'] != identifier:
+            abort(401)
 
-    @app.route('/login')
-    def login():
-        """Log into an account, or trigger OAuth with a new account."""
+        user = DatabaseHandler.get_user(session['user_id'])
+        if user is None:
+            abort(401)
 
-        # TODO: Wire this into OAuth
-        return render_template('login.html')
+        if request.method == 'POST':
+            new_repo = request.form['repo-url-new']
+            submit_value = request.form['submit']
 
+            if new_repo != '':
+                repo_url_to_add = new_repo
+                # TODO: Add new repo here.
+
+            if submit_value.startswith['delete-repo-']:
+                repo_id_to_delete = submit_value[12:]
+                # TODO: Delete repo here.
+
+        return render_template('account.html',
+                               user=user,
+                               repos=user.repos)
 
     @app.route('/status')
     @app.route('/status/<identifier>')
     def status(identifier=None):
-        """Get a list of active jobs, or get the status of a job in progress."""
+        """Get a list of active jobs, or get the status of a job in progress.
+
+        :param identifier: A UUID identifying the job.
+        """
 
         if identifier is not None:
-            # job = DatabaseHandler.get_job(identifier)
-            # if not job.endTime:
-            #     currently_running = True
-            #     duration = datetime.now() - job.startTime
-            # else:
-            #     currently_running = False
-            #     duration = job.endTime - job.startTime
+            job = DatabaseHandler.get_job(identifier)
+            if job is None:
+                abort(404)
 
-            return render_template('status.html')
-            # return render_template('status.html',
-            #                        identifier=job.job_id,
-            #                        repo_url=job.url,
-            #                        currently_running=currently_running,
-            #                        duration=duration,
-            #                        status=job.status)
+            if job.end_time is None:
+                currently_running = True
+                duration = datetime.now() - job.start_time
+            else:
+                currently_running = False
+                duration = job.end_time - job.start_time
+
+            return render_template('status.html',
+                                   job=job,
+                                   currently_running=currently_running,
+                                   duration=duration)
         else:
-            # TODO: Use logged in cookies to get jobs for user
-            # user_id = cookie.get_id()
-            # user = DatabaseHandler.get_user(user_id)
-            # if user is not None:
-            #   jobs = user.jobs
-            return render_template('status.html')
+            if not session.get('user_id'):
+                abort(401)
 
+            user = DatabaseHandler.get_user(session['user_id'])
+            if user is None:
+                abort(401)
+
+            return render_template('status.html', user=user)
 
     @app.route('/terms')
     def terms():
@@ -143,7 +148,6 @@ if not DEBUG:
         # lintball.lint_github.delay(payload=payload)
         return
 
-
     @app.route('/register')
     def github_oauth():
         """Redirect user to github OAuth registeration page."""
@@ -159,7 +163,6 @@ if not DEBUG:
         url = '{}?{}'.format(url, params_str)
 
         return redirect(url, code=302)
-
 
     @app.route('/callback')
     def github_oauth_response():
@@ -203,6 +206,9 @@ if not DEBUG:
         if DatabaseHandler.get_user(github_user_id) is None:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
+
+        # Save to active session to stay logged in.
+        session['user_id'] = user.id
 
         return redirect(url_for('account'))
 
