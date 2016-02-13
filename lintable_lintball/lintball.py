@@ -52,7 +52,7 @@ def lint_github(payload: json, task_id=uuid4()):
         logger.error('Unable to locate oauth_token for {user} with id of {id}'.format(user=owner, id=github_id))
         return
 
-    repo_url = 'https://{oauth_key}github.com/{full_name}.git'.format(
+    repo_url = 'https://{oauth_key}@github.com/{full_name}.git'.format(
         oauth_key=oauth_key,
         full_name=payload['repository']['full_name'])
 
