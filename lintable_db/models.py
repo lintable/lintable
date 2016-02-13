@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
                     DateTimeField, CharField, UUIDField, BooleanField,
                     PostgresqlDatabase)
-from simplecrypt import decrypt, encrypt
+from simplecrypt import decrypt, encrypt, EncryptionException
 
 from lintable_db.fields import OauthField
 from lintable_settings.settings import LINTWEB_SETTINGS
@@ -78,14 +78,15 @@ class User(BaseModel):
                        self.token).decode('utf8')
 
     def save(self, *args, **kwargs):
-        try:
-            # has this value been encrypted?
-            decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
+        if self.token.__class__ == str:
+            try:
+                self.token = encrypt(
+                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
                     self.token)
-        except Exception as e:
-            self.token = encrypt(
-                LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                self.token)
+            except EncryptionException as e:
+                print('Unable to encrypt OAuth token. User not saved'\
+                      'Exception: \n{}'.format(e))
+                return None
         return super(User, self).save(*args, **kwargs)
 
 
