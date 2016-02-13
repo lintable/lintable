@@ -41,16 +41,16 @@ class LogHandler(DoNothingHandler):
         super().retrieve_changed_file_set(uuid, a_commit, b_commit)
         self.logger.info('Retrieving files from {a_commit} and {b_commit}'.format(a_commit=a_commit, b_commit=b_commit))
 
-    def report(self, uuid: UUID, report: LintReport):
+    def report(self, uuid: UUID, lint_report: LintReport):
         """Called when the linting process has produced a LintReport."""
 
-        super().report(uuid, report)
-        num_of_files = len(report.errors)
+        super().report(uuid, lint_report)
+        num_of_files = len(lint_report.errors)
         files_with_errors = dict((filename, errors) for filename, errors in report.errors.items() if len(errors) > 0)
 
         self.logger.info('Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,
                                                                                      fwe=len(files_with_errors)))
-        for f, e in report.errors.items():
+        for f, e in lint_report.errors.items():
             if len(e) > 0:
                 self.logger.info('File {file} contains $errors errors.'.format(file=f, e=len(e)))
                 for l, c, m in e:

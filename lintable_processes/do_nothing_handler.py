@@ -51,7 +51,7 @@ class DoNothingHandler(object):
 
         return
 
-    def report(self, uuid: UUID, report: LintReport):
+    def report(self, uuid: UUID, lint_report: LintReport):
         """Called when the linting process has produced a LintReport."""
 
         return
