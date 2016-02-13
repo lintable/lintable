@@ -20,3 +20,14 @@ from lintable_lintball.lint_error import LintError
 
 # The keys in the errors dictionary are the file names of the files linted
 LintReport = NamedTuple('LintReport', [('errors', Dict[str, List[LintError]])])
+
+
+def create_from_db_query(rows)-> LintReport:
+    errors = {}
+
+    for row in rows:
+        errors.setdefault(row.file_name, []).append(LintError(column=row.column_number,
+                                                              line_number=row.line_number,
+                                                              msg=row.error_message))
+
+    return LintReport(errors=errors)
