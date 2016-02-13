@@ -17,9 +17,9 @@
 import json
 import logging
 import urllib.parse
+from datetime import datetime
 
 import requests
-# from datetime import datetime
 from flask import Flask, request, render_template, redirect, url_for, session, abort
 from github import Github
 
