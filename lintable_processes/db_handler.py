@@ -1,3 +1,5 @@
+"""Updates the database based on a job's progress."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +28,7 @@ from lintable_processes.do_nothing_handler import DoNothingHandler
 
 
 class DBHandler(DoNothingHandler):
+    """Updates the database based on a job's progress."""
 
     def __init__(self, repo_id: int):
         super().__init__()
@@ -34,11 +37,15 @@ class DBHandler(DoNothingHandler):
         self.repo_fk = None  # type: Optional[models.Repo]
 
     def report(self, uuid: UUID, report: LintReport):
+        """Called when the linting process has produced a LintReport."""
+
         super().report(uuid, report)
         self.job.status = 'REPORT'
         self.job.save()
 
     def started(self, uuid: UUID, comment_id: int = None):
+        """Kicks off the process."""
+
         super().started(uuid, comment_id)
         self.repo_fk = DatabaseHandler.get_repo(identifier=self.repo_id)
         self.job = Jobs.create(job_id=uuid,
@@ -51,26 +58,36 @@ class DBHandler(DoNothingHandler):
         self.job.save()
 
     def lint_file(self, uuid: UUID, linter: str, file: str):
+        """Called when each file is linted."""
+
         super().lint_file(uuid, linter, file)
         if self.job.status != 'LINT_FILES':
             self.job.status = 'LINT_FILES'
             self.job.save()
 
     def finish(self, uuid: UUID):
+        """Called as a last step to clean up the linting process."""
+
         super().finish(uuid)
         self.job.end_time = datetime.datetime.now()
         self.job.status = 'FINISHED'
         self.job.save()
 
     def retrieve_file_from_commit(self, uuid: UUID, file: str, commit: Commit):
+        """Called for each file being retrieved."""
+
         super().retrieve_file_from_commit(uuid, file, commit)
         self.job.status = 'RETRIEVE_FILES'
         self.job.save()
 
     def retrieve_changed_file_set(self, uuid: UUID, a_commit: Commit, b_commit: Commit):
+        """Indicates what files are going to be retrieved for the 2 commits."""
+
         super().retrieve_changed_file_set(uuid, a_commit, b_commit)
 
     def clone_repo(self, uuid: UUID, repo: Repo, local_path: str):
+        """Indicates a repo has been cloned and where that clone is located."""
+
         super().clone_repo(uuid, repo, local_path)
         self.job.status = 'CLONE_REPO'
         self.job.save()

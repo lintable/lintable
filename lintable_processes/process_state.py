@@ -1,3 +1,5 @@
+"""Enum for tracking the state of the linting process."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +17,8 @@
 from enum import Enum
 
 class ProcessState(Enum):
-    """
-    This tracks the state of the linting process
-    """
+    """Enum for tracking the state of the linting process."""
+
     STARTED = 1,  # process has started
     CLONE_REPO = 2,  # the repo is being cloned
     RETRIEVE_FILES = 3,  # the files are being retrieved from the repo

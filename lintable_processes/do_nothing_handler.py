@@ -1,3 +1,5 @@
+"""Does-nothing class to be used for subclassing."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,30 +21,42 @@ from git import Commit, Repo
 from lintable_lintball.lint_report import LintReport
 
 class DoNothingHandler(object):
-    """
-    This is a do nothing handler.
-    The process handler delegates to a subclass of this.
-    """
+    """Does-nothing class to be used for subclassing."""
+
     def __init__(self):
         pass
 
     def started(self, uuid: UUID, comment_id: int = None):
+        """Kicks off the process."""
+
         return
 
     def clone_repo(self, uuid: UUID, repo: Repo, local_path: str):
+        """Indicates a repo has been cloned and where that clone is located."""
+
         return
 
     def retrieve_changed_file_set(self, uuid: UUID, a_commit: Commit, b_commit: Commit):
+        """Indicates what files are going to be retrieved for the 2 commits."""
+
         return
 
     def retrieve_file_from_commit(self, uuid: UUID, file: str, commit: Commit):
+        """Called for each file being retrieved."""
+
         return
 
     def lint_file(self, uuid: UUID, linter: str, file: str):
+        """Called when each file is linted."""
+
         return
 
     def report(self, uuid: UUID, report: LintReport):
+        """Called when the linting process has produced a LintReport."""
+
         return
 
     def finish(self, uuid: UUID):
+        """Called as a last step to clean up the linting process."""
+
         return

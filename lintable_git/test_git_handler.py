@@ -1,3 +1,5 @@
+"""Tests for GitHandler."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +31,8 @@ logging.basicConfig(filename='./git_handler_tests.log', level=logging.DEBUG)
 
 
 class GitHandlerTests(unittest.TestCase):
+    """Tests for GitHandler."""
+
     def setUp(self):
         self.logger = logging.getLogger('test_git_handler')
         self.tmp_repo = tempfile.mkdtemp()
@@ -67,11 +71,15 @@ class GitHandlerTests(unittest.TestCase):
         shutil.rmtree(self.tmp_repo)
 
     def create_and_commit_file(self, filename: str):
+        """Make sure that committing a file to the git repo works."""
+
         self.create_random_text_file(filename)
         self.repo.index.add(filename)
         self.repo.index.commit('commit of {filename}'.format(filename=filename))
 
     def commit_files(self, *args, **kwargs) -> Commit:
+        """Make sure that committing multiple files to the git repo works."""
+
         msg = kwargs['msg']
         files = args
 
@@ -81,6 +89,8 @@ class GitHandlerTests(unittest.TestCase):
         return self.repo.index.commit(message=msg)
 
     def create_random_text_file(self, filename: str):
+        """Create a text file with some random contents."""
+
         content = ''
 
         for x in range(1, 10):
@@ -91,11 +101,15 @@ class GitHandlerTests(unittest.TestCase):
             generated_file.write(content)
 
     def modify_random_text_file(self, filename: str):
+        """Make sure that creating a text file works."""
+
         os.remove(filename)
 
         self.create_random_text_file(filename)
 
     def test_clone_repo(self):
+        """Make sure that cloning a git repo locally works."""
+
         self.logger.debug('Testing git_handler.clone_repo')
         self.git_handler.clone_repo()
         self.logger.debug('{dir} contains {files}'.format(dir=self.tmp_repo, files=os.listdir(self.tmp_repo)))

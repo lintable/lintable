@@ -1,3 +1,5 @@
+"""Wrappers for assorted linters."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,25 +21,26 @@ from abc import ABC, abstractmethod
 
 from lintable_lintball.lint_error import LintError
 
-""" An abstract base class defining a simple contract for linters and no implementation. """
-
-
 class LintWrapper(ABC):
+    """Abstract base class for a contract for linters. No implementation."""
+
     @abstractmethod
     def lint(self, filename: str) -> List[LintError]:
+        """Lint a given file by filename."""
+
         return None
 
-
-"""
-An implementation of LintWrapper which is itself also an abstract base class with what is hopefully a
-reasonable implementation for the lint(...) function.
-"""
-
-
 class FileLintWrapper(LintWrapper):
+    """Abstract base class for file-based linters.
+
+    Hopefully a reasonable implementation for the lint(...) function.
+    """
+
     lint_command = "/bin/echo"
 
     def lint_file(self, filename: str, optional_parameters: List[str] = None) -> List[LintError]:
+        """Have the linter lint a given file."""
+
         call_parameters = [self.lint_command, filename]
 
         if optional_parameters is not None:
@@ -52,4 +55,6 @@ class FileLintWrapper(LintWrapper):
 
     @abstractmethod
     def parse_linter_output(self, output: str) -> List[LintError]:
+        """Process output from the linter."""
+
         return None
