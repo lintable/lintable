@@ -25,8 +25,9 @@ from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
 
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import User, Jobs, Repo
-from lintable_lintball.lint_report import LintReport
+from lintable_db.models import User, Jobs, Repo, Report
+from lintable_lintball.lint_error import LintError
+from lintable_lintball.lint_report import LintReport, create_from_db_query
 from lintable_processes.db_handler import DBHandler
 from lintable_settings.settings import LINTWEB_SETTINGS
 
@@ -45,6 +46,7 @@ class DBHandlerTests(unittest.TestCase):
         User._meta.database = test_db
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
+        Report._meta.database = test_db
 
         # Create local objects that can be written
         # written to the database during a test
@@ -52,7 +54,7 @@ class DBHandlerTests(unittest.TestCase):
         self.repo1 = Repo(repo_id=1, owner=self.user1,
                           url='https://github.com/user/repo.git')
 
-        for i in [User, Jobs, Repo]:
+        for i in [User, Jobs, Repo, Report]:
             if not i.table_exists():
                 test_db.create_table(i)
 
@@ -104,10 +106,21 @@ class DBHandlerTests(unittest.TestCase):
             self.get_and_check_job_status(status='LINT_FILES')
 
     def test_report(self):
-        report = {}  # type: LintReport
+        report = LintReport(errors=dict(a_file=[LintError(line_number=1,
+                                                          column=2,
+                                                          msg='Some error message')]))  # type: LintReport
+
         with test_database(test_db, ()):
             self.db_handler.report(self.uuid, report)
-            self.get_and_check_job_status(status='REPORT')
+            job = self.get_and_check_job_status(status='REPORT')
+
+            # now check that the lint_report got saved
+
+            retrieved_report = create_from_db_query(job.reports)
+            self.assertIsNotNone(retrieved_report)
+            self.assertEqual(report,
+                             retrieved_report,
+                             'The original lint_report and the retrieved lint_report should be the same')
 
     def test_finished(self):
         with test_database(test_db, ()):
