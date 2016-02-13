@@ -65,22 +65,10 @@ def index():
         return render_template('index.html')
 
 if not DEBUG:
-    @app.route('/account', methods=['GET', 'POST'])
+    @app.route('/account')
     @login_required
     def account():
         """View details for an existing user account."""
-
-        if request.method == 'POST':
-            new_repo = request.form['repo-url-new']
-            submit_value = request.form['submit']
-
-            if new_repo != '':
-                repo_url_to_add = new_repo
-                # TODO: Add new repo here.
-
-            if submit_value.startswith['delete-repo-']:
-                repo_id_to_delete = submit_value[12:]
-                # TODO: Delete repo here.
 
         return render_template('account.html')
 

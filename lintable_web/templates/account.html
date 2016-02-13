@@ -20,49 +20,9 @@ limitations under the License.
 {% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
 {% block content %}
-  <form method="post">
-    <div class="card">
-      <div class="card-header">
-        Account Settings
-      </div>
-      <div class="card-block">
-        <fieldset class="form-group">
-          <label for="user-token">OAuth Token</label>
-          <input type="text" class="form-control"
-            id="user-token"
-            name="user-token"
-            value="{{ current_user.get_oauth_token() }}"
-            placeholder="Token goes here">
-        </fieldset>
-      </div>
-    </div>
-
-    {% for repo in current_user.repos %}
-      <div class="card">
-        <div class="card-header">
-          <a href="{{ repo.url }}">{{ repo.url }}</a>
-
-          <button class="btn btn-sm btn-danger pull-xs-right" type="submit" value="delete-repo-{{ repo.repo_id }}">Delete</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          New Repo
-        </div>
-        <div class="card-block">
-          <fieldset class="form-group">
-            <label for="repo-url-new">Repo URL</label>
-            <input type="text" class="form-control"
-              id="repo-url-new"
-              name="repo-url-new"
-              value=""
-              placeholder="http://...">
-          </fieldset>
-        </div>
-      </div>
-    {% endfor %}
-
-    <p><button type="submit" value="save" class="btn btn-primary" href="#">Save Changes</button></p>
-  </form>
+  {% for repo in current_user.repos %}
+    <ul class="list-group">
+      <li class="list-group-item"><a href="{{ repo.url }}">{{ repo.url }}</a></li>
+    </ul>
+  {% endfor %}
 {% endblock %}
