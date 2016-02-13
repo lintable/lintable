@@ -22,7 +22,7 @@ from git import Commit, Repo
 
 from lintable_db import models
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import Jobs
+from lintable_db.models import Jobs, Report
 from lintable_lintball.lint_report import LintReport
 from lintable_processes.do_nothing_handler import DoNothingHandler
 
@@ -36,10 +36,20 @@ class DBHandler(DoNothingHandler):
         self.repo_id = repo_id
         self.repo_fk = None  # type: Optional[models.Repo]
 
-    def report(self, uuid: UUID, report: LintReport):
+    def report(self, uuid: UUID, lint_report: LintReport):
         """Called when the linting process has produced a LintReport."""
 
-        super().report(uuid, report)
+        super().report(uuid, lint_report)
+
+        for filename, errors in lint_report.errors.items():
+            for error in errors:
+                line = Report.create(report_number=self.job,
+                                     file_name=filename,
+                                     column_number=error.column,
+                                     line_number=error.line_number,
+                                     error_message=error.msg)
+                line.save()
+
         self.job.status = 'REPORT'
         self.job.save()
 
