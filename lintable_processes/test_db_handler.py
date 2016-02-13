@@ -23,6 +23,7 @@ from uuid import uuid4
 import git
 from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
+from cryptography.fernet import Fernet
 
 from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, Jobs, Repo
@@ -39,7 +40,7 @@ logging.basicConfig(filename='./db_handler_tests.log', level=logging.DEBUG)
 class DBHandlerTests(unittest.TestCase):
     def setUp(self):
         # Override our default encryption key.
-        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
+        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = Fernet.generate_key()
 
         self.db = DatabaseHandler()
         User._meta.database = test_db

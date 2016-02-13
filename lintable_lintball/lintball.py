@@ -1,3 +1,5 @@
+"""Handles linter tasks for a given repo."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +35,8 @@ from lintable_processes.process_handler import ProcessHandler
 
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):
+    """Receive a task to lint a Github repo."""
+
     logger = logging.getLogger()
 
     if payload['action'] != 'opened' and payload['action'] != 'synchronized':
@@ -75,6 +79,7 @@ def lint_github(payload: json, task_id=uuid4()):
 def lint_process(git_handler: GitHandler,
                  process_handler: ProcessHandler,
                  linters=None):
+    """Get the files we're interested in, then start the linter."""
 
     if linters is None:
         linters = [WhitespaceFileLinter()]
@@ -91,6 +96,8 @@ def lint_process(git_handler: GitHandler,
 
 
 def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
+    """Run a linter or linters."""
+
     a_path = os.path.join(handler.local_path, 'a')
     b_path = os.path.join(handler.local_path, 'b')
 
@@ -117,6 +124,8 @@ def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
 
 
 def lint(filename: str, linters: List[LintWrapper], handler: ProcessHandler) -> List[LintError]:
+    """Run a linter or linters."""
+
     lint_errors = []
 
     for linter in linters:

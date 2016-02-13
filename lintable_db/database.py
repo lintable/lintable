@@ -1,3 +1,5 @@
+"""Provides utility methods for handling the different database Models."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,15 +23,16 @@ from lintable_db.models import User, Repo, Jobs
 logger = logging.getLogger(__name__)
 
 class DatabaseHandler:
+    """Provides utility methods for handling the different database Models."""
 
     @staticmethod
     def get_repo(identifier: Union[int, str]) -> Repo:
-        """
-        Finds a repo for a given URL
+        """Finds a repo for a given URL.
 
         :param identifier:
         :return Repo or None:
         """
+
         try:
             if isinstance(identifier, int):
                 repo = Repo.get(Repo.repo_id == identifier)
@@ -47,12 +50,12 @@ class DatabaseHandler:
 
     @staticmethod
     def get_user(identifier: Union[int, str]) -> User:
-        """
-        Finds a user for a given ID or username.
+        """Finds a user for a given ID or username.
 
         :param identifier:
         :return User or None:
         """
+
         try:
             if isinstance(identifier, int):
                 user = User.get(User.github_id == identifier)
@@ -69,13 +72,13 @@ class DatabaseHandler:
         return user
 
     def set_job_status(self, job_id: int, status: str) -> int:
-        """
-        Updates job status to provided string.
+        """Updates job status to provided string.
 
         :param job_id:
         :param status:
         :return number of records changed or None:
         """
+
         try:
             job = Jobs.get(Jobs.id == job_id)
             job.status = status
@@ -94,12 +97,12 @@ class DatabaseHandler:
 
     @staticmethod
     def get_job(identifier: UUID) -> Jobs:
-        """
-        Finds a job for a given job ID.
+        """Finds a job for a given job ID.
 
         :param identifier:
         :return Jobs or None:
         """
+
         try:
             job = Jobs.get(Jobs.job_id == identifier)
         except Jobs.DoesNotExist as e:

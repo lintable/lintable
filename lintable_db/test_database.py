@@ -1,3 +1,5 @@
+"""Tests for DatabaseHandler."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +21,7 @@ from uuid import uuid4
 
 from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
+from cryptography.fernet import Fernet
 
 from lintable_db.database import DatabaseHandler, User, Repo, Jobs
 from lintable_settings.settings import LINTWEB_SETTINGS
@@ -31,9 +34,11 @@ logging.basicConfig(filename='./db_tests.log', level=logging.DEBUG)
 
 
 class dbTests(unittest.TestCase):
+    """Tests for DatabaseHandler."""
+
     def setUp(self):
         # Override our default encryption key.
-        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
+        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = Fernet.generate_key()
 
         self.db = DatabaseHandler()
         User._meta.database = test_db
@@ -54,29 +59,38 @@ class dbTests(unittest.TestCase):
                 test_db.create_table(i)
 
     def tearDown(self):
-
         self.user1.delete_instance()
         self.user2.delete_instance()
         self.repo1.delete_instance()
         self.repo2.delete_instance()
 
     def test_shouldHaveUser(self):
+        """Make sure that the database has at least one user."""
+
         with test_database(test_db, ()):
             self.assertIsNotNone(User())
 
     def test_shouldHaveJob(self):
+        """Make sure that the database has at least one job."""
+
         with test_database(test_db, ()):
             self.assertIsNotNone(Jobs())
 
     def test_shouldHaveRepo(self):
+        """Make sure that the database has at least repo."""
+
         with test_database(test_db, ()):
             self.assertIsNotNone(Repo())
 
     def test_returns_none_for_missing_user(self):
+        """Make sure that a user query with no results returns None."""
+
         with test_database(test_db, ()):
             self.assertIsNone(self.db.get_user(''))
 
     def test_find_user_by_id(self):
+        """Make sure that a valid user query returns a user."""
+
         with test_database(test_db, ()):
             # SUT
             self.user1.save()
@@ -95,12 +109,16 @@ class dbTests(unittest.TestCase):
             twin.delete_instance()
 
     def test_get_missing_repo(self):
+        """Make sure that a repo query with no results returns empty iter."""
+
         with test_database(test_db, ()):
             self.user2.save()
             for repo in self.user2.repos:
                 self.assertTrue(False)
 
     def test_get_repos(self):
+        """Make sure that a valid repo query returns an iter with contents."""
+
         with test_database(test_db, ()):
             # SUT
             self.user1.save()
@@ -126,6 +144,8 @@ class dbTests(unittest.TestCase):
             repo3.delete_instance()
 
     def test_get_job(self):
+        """Make sure that a valid single job query returns the job."""
+
         with test_database(test_db, ()):
             # SUT
             self.user1.save()
@@ -142,6 +162,8 @@ class dbTests(unittest.TestCase):
             job.delete_instance()
 
     def test_get_all_jobs(self):
+        """Make sure that a valid job search returns all jobs for user."""
+
         with test_database(test_db, ()):
             # SUT
             self.user1.save()
@@ -168,6 +190,8 @@ class dbTests(unittest.TestCase):
             job2.delete_instance()
 
     def test_sucessfully_adds_user(self):
+        """Make sure that adding a user works."""
+
         with test_database(test_db, ()):
             # SUT
             self.assertIsNone(self.db.get_user(1))

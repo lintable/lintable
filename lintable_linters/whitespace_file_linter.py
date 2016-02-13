@@ -1,3 +1,5 @@
+"""Detects lines in a given file with trailing whitespace."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,13 +22,9 @@ import re
 from lintable_lintball.lint_error import LintError
 from lintable_lintball.lint_wrapper import LintWrapper
 
-
-"""
-The core MVP linter, attempting to detect whitespace on modified lines.
-"""
-
-
 class WhitespaceFileLinter(LintWrapper):
+    """Detects lines in a given file with trailing whitespace."""
+
     ws_regex = re.compile("^(.*?)(\s+)$")
     logger = logging.getLogger(__name__)
 
@@ -34,6 +32,8 @@ class WhitespaceFileLinter(LintWrapper):
         return 'Whitespace Linter'
 
     def lint(self, filename: str) -> List[LintError]:
+        """Lint the given file, provided as a file path."""
+
         total_matches = []
         lines = self.get_lines(filename)
         line_number = 1
@@ -47,6 +47,8 @@ class WhitespaceFileLinter(LintWrapper):
         return total_matches
 
     def has_trailing_whitespace(self, line_number: int, line: str) -> List[LintError]:
+        """Detects whether the given line has trailing whitespace."""
+
         match = self.ws_regex.match(line)
 
         if match:
@@ -57,6 +59,8 @@ class WhitespaceFileLinter(LintWrapper):
             return None
 
     def get_lines(self, filename: str) -> List[str]:
+        """Open the file at the given path and return its contents as a list."""
+
         try:
             with open(filename, 'r') as file:
                 lines = file.readlines()

@@ -1,3 +1,5 @@
+"""Tests for the assorted models."""
+
 # Copyright 2015-2016 Capstone Team G
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +21,7 @@ from peewee import SqliteDatabase
 from playhouse.test_utils import test_database
 from uuid import uuid4
 from datetime import datetime
+from cryptography.fernet import Fernet
 import random
 import string
 
@@ -34,9 +37,11 @@ logging.basicConfig(filename='./model_tests.log', level=logging.DEBUG)
 
 
 class ModelTests(unittest.TestCase):
+    """Tests for the assorted models."""
+
     def setUp(self):
         # Override our default encryption key.
-        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = "donotusethis"
+        LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'] = Fernet.generate_key()
 
         self.db = DatabaseHandler()
         User._meta.database = test_db
@@ -57,6 +62,8 @@ class ModelTests(unittest.TestCase):
                          status='pending')
 
     def test_encrypts_token(self):
+        """Make sure that a new OAuth token is encrypted."""
+
         with test_database(test_db, ()):
             # SUT
             self.assertIsNone(self.db.get_user('new_user'))
@@ -73,6 +80,8 @@ class ModelTests(unittest.TestCase):
             user.delete_instance()
 
     def test_encrypts_token_only_once(self):
+        """Make sure that an existing token isn't further mangled."""
+
         with test_database(test_db, ()):
             # SUT
             self.assertIsNone(self.db.get_user(2))
@@ -93,6 +102,8 @@ class ModelTests(unittest.TestCase):
             user.delete_instance()
 
     def test_decrypts_token(self):
+        """Make sure that an existing token can be decrypted."""
+
         with test_database(test_db, ()):
             # SUT
             self.assertIsNone(self.db.get_user(2))
@@ -109,6 +120,8 @@ class ModelTests(unittest.TestCase):
             user.delete_instance()
 
     def test_token_type(self):
+        """Make sure that an existing token is the right object type."""
+
         with test_database(test_db, ()):
             self.assertTrue(self.user1.token.__class__ == str)
             self.user1.save()
@@ -119,6 +132,8 @@ class ModelTests(unittest.TestCase):
             user.delete_instance()
 
     def test_get_token_from_repo(self):
+        """Make sure that a query by repo can return a token."""
+
         # SUT
         user = User(github_id=23, token='dummyToken')
         user.save()
@@ -127,6 +142,8 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(user.get_oauth_token(), repo.get_oauth_token())
 
     def test_state(self):
+        """Make sure that saving state works."""
+
         # SUT
         state = GithubString(state_string='state')
 
@@ -137,6 +154,8 @@ class ModelTests(unittest.TestCase):
         self.assertTrue(state.delete_instance() == 1)
 
     def test_report(self):
+        """Make sure that a report in the database can be accessed."""
+
         # SUT
         self.user1.save()
         self.repo1.save()
@@ -155,6 +174,8 @@ class ModelTests(unittest.TestCase):
         report.delete_instance()
 
     def test_report_length(self):
+        """Make sure that a report in the database has the right length."""
+
         # SUT
         self.user1.save()
         self.repo1.save()
