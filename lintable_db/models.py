@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
                     DateTimeField, CharField, PostgresqlDatabase, UUIDField)
 from simplecrypt import decrypt, encrypt, EncryptionException
+from cryptography.fernet import Fernet
 
 from lintable_db.fields import OauthField
 from lintable_settings.settings import LINTWEB_SETTINGS
@@ -50,15 +51,14 @@ class User(BaseModel):
 
         :return decrypted oauth token as a string:
         """
-        return decrypt(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                       self.token).decode('utf8')
+        decrypter = Fernet(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
+        return decrypter.decrypt(self.token).decode('utf8')
 
     def save(self, *args, **kwargs):
         if self.token.__class__ == str:
             try:
-                self.token = encrypt(
-                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'],
-                    self.token)
+                encrypter = Fernet(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
+                self.token = encrypter.encrypt(bytes(self.token, 'utf8'))
             except EncryptionException as e:
                 print('Unable to encrypt OAuth token. User not saved'\
                       'Exception: \n{}'.format(e))
