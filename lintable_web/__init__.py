@@ -48,6 +48,7 @@ DEBUG = LINTWEB_SETTINGS['DEBUG']
 def load_user(identifier: str) -> User:
     """Return a User object based on the given identifier."""
 
+    LOGGER.debug('Finding a user object for logins: %s', identifier)
     return DatabaseHandler.get_user(int(identifier))
 
 ################################################################################
@@ -59,9 +60,11 @@ def index():
     """View the homepage."""
 
     if DEBUG:
+        LOGGER.debug('/ with debug route triggered')
         return render_template('coming_soon.html')
 
     if not DEBUG:
+        LOGGER.debug('/ without debug route triggered')
         return render_template('index.html')
 
 if not DEBUG:
@@ -70,6 +73,7 @@ if not DEBUG:
     def account():
         """View details for an existing user account."""
 
+        LOGGER.debug('/account route triggered')
         return render_template('account.html')
 
     @app.route('/status')
@@ -81,9 +85,11 @@ if not DEBUG:
         :param identifier: A UUID identifying the job.
         """
 
+        LOGGER.debug('/status route triggered')
         if identifier is None:
             return render_template('status.html')
 
+        LOGGER.debug('Getting job from database: %s', identifier)
         job = DatabaseHandler.get_job(identifier)
         if job is None:
             abort(404)
@@ -107,6 +113,8 @@ if not DEBUG:
     def terms():
         """View the terms of service."""
         # TODO: Possibly pull content from Markdown file
+
+        LOGGER.debug('/terms route triggered')
         return render_template('terms.html')
 
 
@@ -114,6 +122,8 @@ if not DEBUG:
     def privacy():
         """View the privacy policy."""
         # TODO: Possibly pull content from Markdown file
+
+        LOGGER.debug('/privacy route triggered')
         return render_template('privacy.html')
 
 
@@ -121,18 +131,23 @@ if not DEBUG:
     def security():
         """View the security info."""
         # TODO: Possibly pull content from Markdown file
+
+        LOGGER.debug('/security route triggered')
         return render_template('security.html')
 
 
     @app.route('/support')
     def support():
         """View the support page."""
-        return render_template('support.html')
 
+        LOGGER.debug('/support route triggered')
+        return render_template('support.html')
 
     @app.route('/payload', methods=['POST'])
     def github_payload():
         """Trigger processing of a JSON payload."""
+
+        LOGGER.debug('/payload route triggered')
         payload = request.get_json()
         # TODO: Make this actually work. Currently, lintball crashes on import.
         # lintball.lint_github.delay(payload=payload)
@@ -140,11 +155,14 @@ if not DEBUG:
 
     @app.route('/login')
     def login():
+        LOGGER.debug('/login route triggered')
         return redirect(url_for('github_oauth'))
 
     @app.route('/register')
     def github_oauth():
         """Redirect user to github OAuth registeration page."""
+
+        LOGGER.debug('/register route triggered')
 
         url = LINTWEB_SETTINGS['github']['OAUTH_URL']
         params = {
@@ -156,11 +174,13 @@ if not DEBUG:
         params_str = urllib.parse.urlencode(params)
         url = '{}?{}'.format(url, params_str)
 
+        LOGGER.debug('Sending user to %s', url)
         return redirect(url, code=302)
 
     @app.route('/logout')
     @login_required
     def logout():
+        LOGGER.debug('/logout route triggered')
         logout_user()
         return redirect(url_for('index'))
 
@@ -168,11 +188,13 @@ if not DEBUG:
     def github_oauth_response():
         """Receive OAuth code and retrieve token."""
 
+        LOGGER.debug('/callback route triggered')
         code = request.args.get('code')
         url = LINTWEB_SETTINGS['github']['OAUTH_URL_POST']
 
         if code is None:
-            return "No github code found"
+            LOGGER.debug('No Github code in request')
+            return "No Github code found"
 
         # Construct outgoing data and a header
         outgoing = {
@@ -184,12 +206,14 @@ if not DEBUG:
         headers = {'Accept': 'application/json'}
 
         # Post data to github and capture response then parse returned JSON
+        LOGGER.debug('Attemtping Github post with code')
         github_request = None
         try:
             github_request = requests.post(url, data=outgoing, headers=headers)
         except requests.exceptions.RequestException as ex:
             LOGGER.error('Error posting to github: %s', ex)
 
+        LOGGER.debug('Got payload from Github: %s', github_request.text)
         payload = json.loads(github_request.text)
         access_token = payload['access_token']
         scope_given = payload['scope'].split(',')
@@ -201,16 +225,20 @@ if not DEBUG:
                 flash('You did not accept our permissions.')
                 return redirect(url_for('index'))
 
+        LOGGER.debug('Retrieving user from Github lib: %s', access_token)
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
 
+        LOGGER.debug('Retrieving user from database: %s', github_user_id)
         user = DatabaseHandler.get_user(github_user_id)
         if user is None:
             user = User(github_id=github_user_id, token=access_token)
             user.save()
 
+        LOGGER.debug('Saving login session')
         login_user(user)
 
+        LOGGER.debug('Redirecting to homepage')
         flash('Logged in successfully.')
         return redirect(request.args.get('next') or url_for('account'))
 
