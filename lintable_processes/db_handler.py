@@ -63,7 +63,6 @@ class DBHandler(DoNothingHandler):
                                repo=self.repo_fk,
                                start_time=datetime.datetime.now(),
                                end_time=None,
-                               comment_number=comment_id,
                                status='STARTED')
         self.job.save()
 

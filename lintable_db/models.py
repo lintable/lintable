@@ -75,13 +75,16 @@ class User(BaseModel):
     def get_id(self) -> str:
         """Returns the user id as a string."""
 
-        return str(self.id)
+        return str(self.github_id)
 
     def get_oauth_token(self) -> str:
         """Return the OAuth token for a user.
 
         :return decrypted oauth token as a string:
         """
+        if isinstance(self.token, str):
+            self.token = bytes(self.token, 'utf8')
+
         decrypter = Fernet(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
         return decrypter.decrypt(self.token).decode('utf8')
 
@@ -90,7 +93,8 @@ class User(BaseModel):
 
         if self.token.__class__ == str:
             try:
-                encrypter = Fernet(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
+                encrypter = Fernet(
+                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
                 self.token = encrypter.encrypt(bytes(self.token, 'utf8'))
             except EncryptionException as e:
                 print('Unable to encrypt OAuth token. User not saved'\
@@ -124,7 +128,6 @@ class Jobs(BaseModel):
     repo = ForeignKeyField(Repo)
     start_time = DateTimeField()
     end_time = DateTimeField(null=True)
-    comment_number = IntegerField()
     status = CharField()
 
 

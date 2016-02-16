@@ -46,7 +46,7 @@ class LogHandler(DoNothingHandler):
 
         super().report(uuid, lint_report)
         num_of_files = len(lint_report.errors)
-        files_with_errors = dict((filename, errors) for filename, errors in report.errors.items() if len(errors) > 0)
+        files_with_errors = dict((filename, errors) for filename, errors in lint_report.errors.items() if len(errors) > 0)
 
         self.logger.info('Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,
                                                                                      fwe=len(files_with_errors)))

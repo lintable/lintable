@@ -169,20 +169,13 @@ class dbTests(unittest.TestCase):
             self.user1.save()
             self.repo1.save()
             job1 = Jobs(job_id=uuid4(), repo_owner=self.user1, repo=self.repo1,
-                        start_time=datetime.now(),
-                        comment_number=1, status='pending')
+                        start_time=datetime.now(),status='pending')
             job2 = Jobs(job_id=uuid4(), repo_owner=self.user1, repo=self.repo1,
-                        start_time=datetime.now(),
-                        comment_number=2, status='pending')
+                        start_time=datetime.now(),status='pending')
             job1.save()
             job2.save()
 
             # exercise
-            for job in self.user1.jobs:
-                self.assertEqual(job.repo_owner.github_id, self.user1.github_id)
-                self.assertTrue(job.comment_number == job1.comment_number or
-                                job.comment_number == job2.comment_number)
-
             self.assertTrue(self.user1.jobs == 2)
 
             # clean up
