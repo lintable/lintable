@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+from datetime import date, timedelta
 from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
@@ -130,6 +131,21 @@ class Jobs(BaseModel):
     end_time = DateTimeField(null=True)
     status = CharField()
 
+    def finished(self) -> bool:
+        """Get whether the job is finished or not."""
+
+        if self.end_time is None:
+            return False
+
+        return True
+
+    def duration(self) -> timedelta:
+        """Get the duration of the job."""
+
+        if self.finished():
+            return (self.end_time - self.start_time)
+
+        return (date.today() - self.start_time)
 
 class Report(BaseModel):
     """A linting results report."""

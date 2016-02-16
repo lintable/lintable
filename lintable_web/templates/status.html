@@ -34,18 +34,27 @@ limitations under the License.
       <thead>
         <tr>
           <th class="text-xs-center">Job ID</th>
+          <th>Status</th>
           <th>Duration</th>
           <th>Repo</th>
-          <th>Last Commit</th>
         </tr>
       </thead>
       <tbody>
         {% for job in current_user.jobs %}
           <tr>
-            <td class="text-xs-center"><a class="btn btn-info btn-sm" href="/status/{{ job.job_id }}"><span class="octicon octicon-sync"></span>  {{ job.job_id }}</a></td>
-            <td></td>
+            <td class="text-xs-center">
+              {% if job.finished() %}
+                <span class="octicon octicon-check"></span>
+              {% else %}
+                <span class="octicon octicon-sync"></span>
+              {% endif %}
+              <a href="/status/{{ job.job_id }}">
+                {{ job.job_id }}
+              </a>
+            </td>
+            <td>{{ job.status }}</td>
+            <td>{{ job.duration() }}</td>
             <td><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></td>
-            <td><code></code></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -56,9 +65,9 @@ limitations under the License.
     <p class="lead">
       This job is
       {% if currently_running %}
-        <b>currently running</b>. It's been running for <b>{{ duration.seconds }} seconds</b>.
+        <b>currently running</b>. It's been running for <b>{{ job.duration() }}</b>.
       {% else %}
-        <b>finished</b>. It took <b>{{ duration.seconds }} seconds</b>.
+        <b>finished</b>. It took <b>{{ job.duration() }}</b>.
       {% endif %}
     </p>
 
@@ -66,13 +75,11 @@ limitations under the License.
       <dt>Job ID</dt>
       <dd>{{ job.job_id }}</dd>
 
-      <dt>Repo</dt>
-      <dd><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></dd>
-
       <dt>Status</dt>
       <dd>{{ job.status }}</dd>
-    </dl>
 
-    <p><a href="#" class="btn btn-danger">Cancel Job</a></p>
+      <dt>Repo</dt>
+      <dd><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></dd>
+    </dl>
   {% endif %}
 {% endblock %}

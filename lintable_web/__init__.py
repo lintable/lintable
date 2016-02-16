@@ -93,17 +93,7 @@ if not DEBUG:
         if job.user is not current_user:
             abort(403)
 
-        if job.end_time is None:
-            currently_running = True
-            duration = datetime.now() - job.start_time
-        else:
-            currently_running = False
-            duration = job.end_time - job.start_time
-
-        return render_template('status.html',
-                               job=job,
-                               currently_running=currently_running,
-                               duration=duration)
+        return render_template('status.html', job=job)
 
     @app.route('/terms')
     def terms():
