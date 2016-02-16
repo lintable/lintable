@@ -29,6 +29,7 @@ from github import Github
 from lintable_db.database import DatabaseHandler
 from lintable_db.models import User
 from lintable_settings.settings import LINTWEB_SETTINGS
+from lintable_lintball import lintball
 
 app = Flask(__name__) # pylint: disable=invalid-name
 app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
@@ -69,8 +70,9 @@ if not DEBUG:
     @login_required
     def account():
         """View details for an existing user account."""
+        LOGGER.error('in account .... current_user.github_id: {}'.format(current_user.github_id))
 
-        return render_template('account.html')
+        return render_template('account.html', current_user=current_user)
 
     @app.route('/status')
     @app.route('/status/<identifier>')
@@ -135,8 +137,8 @@ if not DEBUG:
         """Trigger processing of a JSON payload."""
         payload = request.get_json()
         # TODO: Make this actually work. Currently, lintball crashes on import.
-        # lintball.lint_github.delay(payload=payload)
-        return
+        lintball.lint_github.delay(payload=payload)
+        return 'successy'
 
     @app.route('/login')
     def login():
@@ -210,8 +212,13 @@ if not DEBUG:
             user.save()
 
         login_user(user)
+        LOGGER.error('current_user.github_id: {}'.format(current_user.github_id))
+        LOGGER.error('user.github_id: {}'.format(user.github_id))
+
 
         flash('Logged in successfully.')
+        LOGGER.error('request.args.get(\'next\') : {}'.format(request.args.get('next')))
+        LOGGER.error('url_for(\'account\'): {}'.format( url_for('account')))
         return redirect(request.args.get('next') or url_for('account'))
 
 ################################################################################

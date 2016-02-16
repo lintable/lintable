@@ -21,7 +21,7 @@ from typing import List
 from uuid import uuid4
 
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import User
+from lintable_db.models import User, Repo
 from lintable_git.git_handler import GitHandler
 from lintable_lintball.lint_error import LintError
 from lintable_lintball.lint_report import LintReport
@@ -32,14 +32,15 @@ from lintable_processes.db_handler import DBHandler
 from lintable_processes.log_handler import LogHandler
 from lintable_processes.process_handler import ProcessHandler
 
-
 @runner.task(serializer='json')
 def lint_github(payload: json, task_id=uuid4()):
     """Receive a task to lint a Github repo."""
 
     logger = logging.getLogger()
-
-    if payload['action'] != 'opened' and payload['action'] != 'synchronize':
+    logger.error('received payload')
+    if payload['action'] not in ['open', 'synchronize', 'reopened']:
+        logger.error('payload ignored...')
+        logger.error('payload action: {}'.format(payload['action']))
         return
 
     github_id = payload['repository']['owner']['id']
@@ -52,6 +53,7 @@ def lint_github(payload: json, task_id=uuid4()):
         logger.error('Unable to locate oauth_token for {user} with id of {id}'.format(user=owner, id=github_id))
         return
 
+
     repo_url = 'https://{oauth_key}@github.com/{full_name}.git'.format(
         oauth_key=oauth_key,
         full_name=payload['repository']['full_name'])
@@ -59,7 +61,11 @@ def lint_github(payload: json, task_id=uuid4()):
     sha1_a = payload['pull_request']['head']['sha']
     sha1_b = payload['pull_request']['base']['sha']
 
-    repo_id = payload['pull_request']['repository']['id']
+    repo_id = payload['repository']['id']
+    if DatabaseHandler.get_repo(repo_id) is None:
+        repo = Repo(repo_id=repo_id, owner=owner,
+                    url=payload['repository']['clone_url'])
+        repo.save()
 
     process_handler = ProcessHandler(repo=repo_url,
                                      uuid=task_id,

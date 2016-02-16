@@ -75,7 +75,7 @@ class User(BaseModel):
     def get_id(self) -> str:
         """Returns the user id as a string."""
 
-        return str(self.id)
+        return str(self.github_id)
 
     def get_oauth_token(self) -> str:
         """Return the OAuth token for a user.
@@ -83,7 +83,7 @@ class User(BaseModel):
         :return decrypted oauth token as a string:
         """
         decrypter = Fernet(LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
-        return decrypter.decrypt(self.token).decode('utf8')
+        return decrypter.decrypt(bytes(self.token, 'utf8')).decode('utf8')
 
     def save(self, *args, **kwargs):
         """Override the default save method for a Model."""
@@ -124,7 +124,6 @@ class Jobs(BaseModel):
     repo = ForeignKeyField(Repo)
     start_time = DateTimeField()
     end_time = DateTimeField(null=True)
-    comment_number = IntegerField()
     status = CharField()
 
 

@@ -39,7 +39,7 @@ LINTWEB_SETTINGS = {
 #: Settings dictionary for lintball.
 LINTBALL_SETTINGS = {
     'celery': {
-        'broker': os.environ.get('CELERY_BROKER', 'amqp://'),
-        'backend': os.environ.get('CELERY_BACKEND', 'redis://')
+        'broker': os.environ.get('CLOUDAMQP_URL', 'amqp://'),
+        'backend': os.environ.get('REDIS_URL', 'redis://')
     }
 }
