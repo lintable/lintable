@@ -17,7 +17,7 @@ limitations under the License.
 {% extends "_wrapper.html" %}
 
 {% block headtitle %}Lintable | Account{% endblock %}
-{% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
+{% block pagetitle %}Account: {{ current_user.github_id }}{% endblock %}
 
 {% block content %}
   {% for repo in current_user.repos %}
