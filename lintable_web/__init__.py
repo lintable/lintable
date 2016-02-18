@@ -126,8 +126,8 @@ if not DEBUG:
     def github_payload():
         """Trigger processing of a JSON payload."""
         payload = request.get_json()
-        # TODO: Make this actually work. Currently, lintball crashes on import.
-        lintball.lint_github.delay(payload=payload)
+        target_url = url_for('status', _external=True)
+        lintball.lint_github.delay(payload=payload, target_url=target_url)
         return 'successy'
 
     @app.route('/login')
