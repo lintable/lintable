@@ -44,7 +44,8 @@ def lint_github(payload: json, target_url: str, task_id=uuid4()):
 
     logger = logging.getLogger()
     logger.error('received payload')
-    if payload['action'] not in ['open', 'synchronize', 'reopened']:
+
+    if payload['action'] not in ['opened', 'synchronize', 'reopened']:
         logger.error('payload ignored...')
         logger.error('payload action: {}'.format(payload['action']))
         return
