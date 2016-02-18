@@ -156,6 +156,10 @@ class Report(BaseModel):
     line_number = IntegerField()
     error_message = CharField()
 
+class ReportSummary(BaseModel):
+    job_id=ForeignKeyField(Jobs, related_name='summaries')
+    file_name = CharField()
+    error_count = IntegerField(default=0)
 
 class GithubString(BaseModel):
     """A test state placeholder."""
