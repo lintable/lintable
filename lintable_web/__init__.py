@@ -195,10 +195,14 @@ if not DEBUG:
 
         github_user = Github(access_token).get_user()
         github_user_id = github_user.id
+        github_name = github_user.name
+        if not github_name:
+            github_name = github_user.login
 
         user = DatabaseHandler.get_user(github_user_id)
         if user is None:
-            user = User(github_id=github_user_id, token=access_token)
+            user = User(github_id=github_user_id, token=access_token,
+                        username=github_name)
             user.save()
 
         login_user(user)
