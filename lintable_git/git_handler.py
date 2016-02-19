@@ -19,6 +19,7 @@ import shutil
 import tempfile
 
 from typing import Iterable, List, Optional
+from typing import Set
 
 from urllib.parse import urlparse
 
@@ -180,6 +181,21 @@ class GitHandler(object):
                 output.write(contents)
 
         return
+
+    @staticmethod
+    def get_files_changed_between_commits(commit_a: Commit, commit_b: Commit)-> (Set[str], Set[str]):
+        diffs = commit_b.diff(other=commit_a)
+
+        a_files = set()  # type: Set[str]
+        b_files = set()  # type: Set[str]
+
+        for diff in diffs:
+            if diff.new_file or (diff.a_blob and diff.b_blob and diff.a_blob != diff.b_blob):
+                a_files.add(diff.a_path)
+                if not diff.new_file:
+                    b_files.add(diff.b_path)
+
+        return a_files, b_files
 
     def get_last_merge(self) -> Commit:
         """Gets the last merge in the repo.
