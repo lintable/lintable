@@ -184,6 +184,17 @@ class GitHandler(object):
 
     @staticmethod
     def get_files_changed_between_commits(commit_a: Commit, commit_b: Commit)-> (Set[str], Set[str]):
+        """Determine what files have been added or modified between commits b and a
+        Those files should be added to a_files and if they are present in commit b,
+        added to b_files
+
+        :param commit_a:
+        :param commit_b:
+        :return: a pair of sets, the first set is the files in commit a
+        the second set is the files in commit b
+        ":rtype (Set[str], Set[str]):
+        """
+
         diffs = commit_b.diff(other=commit_a)
 
         a_files = set()  # type: Set[str]
