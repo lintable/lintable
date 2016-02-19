@@ -141,14 +141,16 @@ class GitHandler(object):
         os.mkdir(self.a_path)
         os.mkdir(self.b_path)
 
-        # get the names of files that were changed from commit a
-        a_files = set(self.commit_a.stats.files.keys())
+        # get the files that were added or modified between commit b and commit a
+        a_files, b_files = self.get_files_changed_between_commits(self.commit_a, self.commit_b)
 
+        # note which files we are checking
         self.files = a_files
+
+        # pull the file contents out from commit a and store them in path a
         self.pull_files_from_commit(self.commit_a, a_files, self.a_path)
 
-        # only include files from commit b that were changed in commit a and in commit b
-        b_files = set(filter(lambda file: file not in self.commit_b.tree, a_files))
+        # pull the file contents out from commit b and store them in path b
         self.pull_files_from_commit(self.commit_b, b_files, self.b_path)
 
         return
