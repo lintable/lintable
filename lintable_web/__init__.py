@@ -30,6 +30,7 @@ from lintable_db.database import DatabaseHandler
 from lintable_db.models import User
 from lintable_settings.settings import LINTWEB_SETTINGS
 from lintable_lintball import lintball
+from lintable_web import md_parser
 
 app = Flask(__name__) # pylint: disable=invalid-name
 app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
@@ -40,6 +41,7 @@ login_manager.init_app(app)
 
 LOGGER = logging.getLogger(__name__)
 DEBUG = LINTWEB_SETTINGS['DEBUG']
+md = md_parser.MarkDownParser()
 
 ################################################################################
 # Authentication helpers
@@ -106,7 +108,8 @@ if not DEBUG:
     def privacy():
         """View the privacy policy."""
         # TODO: Possibly pull content from Markdown file
-        return render_template('privacy.html')
+        privacy_html = md.parse_md_file('/content/privacy.md')
+        return render_template('privacy.html', privacy_html)
 
 
     @app.route('/security')
