@@ -17,6 +17,7 @@
 import markdown
 import codecs
 
+
 class MarkDownParser(object):
     """Provides utility method for parsing markdown files for use in html templates."""
 
