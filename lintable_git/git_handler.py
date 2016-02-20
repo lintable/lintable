@@ -19,6 +19,7 @@ import shutil
 import tempfile
 
 from typing import Iterable, List, Optional
+from typing import Set
 
 from urllib.parse import urlparse
 
@@ -140,14 +141,16 @@ class GitHandler(object):
         os.mkdir(self.a_path)
         os.mkdir(self.b_path)
 
-        # get the names of files that were changed from commit a
-        a_files = set(self.commit_a.stats.files.keys())
+        # get the files that were added or modified between commit b and commit a
+        a_files, b_files = self.get_files_changed_between_commits(self.commit_a, self.commit_b)
 
+        # note which files we are checking
         self.files = a_files
+
+        # pull the file contents out from commit a and store them in path a
         self.pull_files_from_commit(self.commit_a, a_files, self.a_path)
 
-        # only include files from commit b that were changed in commit a and in commit b
-        b_files = set(filter(lambda file: file not in self.commit_b.tree, a_files))
+        # pull the file contents out from commit b and store them in path b
         self.pull_files_from_commit(self.commit_b, b_files, self.b_path)
 
         return
@@ -180,6 +183,32 @@ class GitHandler(object):
                 output.write(contents)
 
         return
+
+    @staticmethod
+    def get_files_changed_between_commits(commit_a: Commit, commit_b: Commit)-> (Set[str], Set[str]):
+        """Determine what files have been added or modified between commits b and a
+        Those files should be added to a_files and if they are present in commit b,
+        added to b_files
+
+        :param commit_a:
+        :param commit_b:
+        :return: a pair of sets, the first set is the files in commit a
+        the second set is the files in commit b
+        ":rtype (Set[str], Set[str]):
+        """
+
+        diffs = commit_b.diff(other=commit_a)
+
+        a_files = set()  # type: Set[str]
+        b_files = set()  # type: Set[str]
+
+        for diff in diffs:
+            if diff.new_file or (diff.a_blob and diff.b_blob and diff.a_blob != diff.b_blob):
+                a_files.add(diff.a_path)
+                if not diff.new_file:
+                    b_files.add(diff.b_path)
+
+        return a_files, b_files
 
     def get_last_merge(self) -> Commit:
         """Gets the last merge in the repo.

@@ -43,6 +43,7 @@ class GitHandlerTests(unittest.TestCase):
 
         a_file = os.path.join(self.tmp_repo, 'a_file.txt')
         b_file = os.path.join(self.tmp_repo, 'b_file.txt')
+        c_file = os.path.join(self.tmp_repo, 'c_file.txt')
 
         # create files a and b
 
@@ -52,7 +53,12 @@ class GitHandlerTests(unittest.TestCase):
         self.logger.debug('files in dir: {files}'.format(files=os.listdir(self.tmp_repo)))
 
         # then commit them as commit b
-        self.commit_b = self.commit_files(b_file, msg='commit b')
+        self.commit_b = self.commit_files(a_file, b_file, msg='commit b')
+
+        # create file c and commit it as commit c
+        self.create_random_text_file(c_file)
+
+        self.commit_files(c_file, msg='commit c')
 
         # modify file a
         self.modify_random_text_file(a_file)
@@ -121,6 +127,15 @@ class GitHandlerTests(unittest.TestCase):
         self.assertSetEqual(set(os.listdir(self.tmp_repo)),
                             set(os.listdir(self.git_handler.cloned_repo_path)))
 
+    def test_get_files_changed_between_commits(self):
+        """Make sure that the function gets only the files present in commit a and
+           and that have been added/modified since commit b"""
+        a_files, b_files = self.git_handler.get_files_changed_between_commits(self.commit_a, self.commit_b)
+
+        # a_files should contain the files added/modified since commit b
+        self.assertTrue(a_files == {'a_file.txt', 'c_file.txt'})
+        # b_files should contain the files add/modified since commit b and were present in commit b
+        self.assertTrue(b_files == {'a_file.txt'})
 
 if __name__ == '__main__':
     unittest.main()
