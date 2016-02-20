@@ -64,10 +64,10 @@ limitations under the License.
   {% if job %}
     <p class="lead">
       This job is
-      {% if currently_running %}
-        <b>currently running</b>. It's been running for <b>{{ job.duration() }}</b>.
-      {% else %}
+      {% if job.finished() %}
         <b>finished</b>. It took <b>{{ job.duration() }}</b>.
+      {% else %}
+        <b>currently running</b>. It's been running for <b>{{ job.duration() }}</b>.
       {% endif %}
     </p>
 
