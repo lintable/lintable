@@ -157,7 +157,7 @@ class Report(BaseModel):
     error_message = CharField()
 
 class ReportSummary(BaseModel):
-    job_id=ForeignKeyField(Jobs, related_name='summaries')
+    job_id = ForeignKeyField(Jobs, related_name='summaries')
     file_name = CharField()
     error_count = IntegerField(default=0)
 
