@@ -28,23 +28,23 @@ from lintable_settings.settings import LINTWEB_SETTINGS
 
 logger = logging.getLogger(__name__)
 
+try:
+    db_url = urlparse(LINTWEB_SETTINGS['peewee']['DATABASE_URL'])
+    database = PostgresqlDatabase(
+        db_url.path[1:],
+        user=db_url.username,
+        password=db_url.password,
+        host=db_url.hostname
+    )
+except Exception as e:
+    logger.error("Unable to connect.\nException: {0}".format(e))
 
 class BaseModel(Model):
     """Elements that apply to all our models."""
 
     class Meta:
         """Database access settings for all our models."""
-
-        try:
-            db_url = urlparse(LINTWEB_SETTINGS['peewee']['DATABASE_URL'])
-            database = PostgresqlDatabase(
-                db_url.path[1:],
-                user=db_url.username,
-                password=db_url.password,
-                host=db_url.hostname
-            )
-        except Exception as e:
-            logger.error("Unable to connect.\nException: {0}".format(e))
+        database = database
 
 
 class User(BaseModel):
