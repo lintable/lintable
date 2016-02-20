@@ -45,6 +45,9 @@ def lint_github(payload: json, target_url: str, task_id=uuid4()):
     logger = logging.getLogger()
     logger.error('received payload')
 
+    if 'action' not in payload:
+        return # New registrations of repos send a payload that does not have an action.
+
     if payload['action'] not in ['opened', 'synchronize', 'reopened']:
         logger.error('payload ignored...')
         logger.error('payload action: {}'.format(payload['action']))
