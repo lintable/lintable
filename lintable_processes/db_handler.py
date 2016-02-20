@@ -22,7 +22,7 @@ from git import Commit, Repo
 
 from lintable_db import models
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import Jobs, Report
+from lintable_db.models import Jobs, Report, ReportSummary
 from lintable_lintball.lint_report import LintReport
 from lintable_processes.do_nothing_handler import DoNothingHandler
 
@@ -53,6 +53,10 @@ class DBHandler(DoNothingHandler):
         self.job.status = 'REPORT'
         self.job.save()
 
+        for summary in self.job.summaries:
+            summary.error_count = len(lint_report.errors[summary.file_name])
+            summary.save()
+
     def started(self, uuid: UUID, comment_id: int = None):
         """Kicks off the process."""
 
@@ -70,6 +74,9 @@ class DBHandler(DoNothingHandler):
         """Called when each file is linted."""
 
         super().lint_file(uuid, linter, file)
+        file_summary = ReportSummary.create(job_id=self.job, file_name=file)
+        file_summary.save()
+
         if self.job.status != 'LINT_FILES':
             self.job.status = 'LINT_FILES'
             self.job.save()
