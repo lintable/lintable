@@ -55,6 +55,6 @@ class ViewsTests(unittest.TestCase):
         result = self.app.get('/callback')
 
         if not LINTWEB_SETTINGS['DEBUG']:
-            self.assertEqual(result.status_code, 302)
+            self.assertEqual(result.status_code, 200)
         else:
             self.assertEqual(result.status_code, 404)
