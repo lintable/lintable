@@ -19,7 +19,7 @@ import logging
 import os
 from typing import List
 from urllib.parse import urljoin
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 import github
 
@@ -39,7 +39,7 @@ from lintable_settings.settings import LINTWEB_SETTINGS
 
 
 @runner.task(serializer='json')
-def lint_github(payload: json, target_url: str, task_id=uuid4()):
+def lint_github(payload: json, target_url: str, task_id: UUID):
     """Receive a task to lint a Github repo."""
 
     logger = logging.getLogger()
