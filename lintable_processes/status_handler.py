@@ -19,6 +19,8 @@ from lintable_lintball.lint_report import LintReport
 from lintable_processes.do_nothing_handler import DoNothingHandler
 import logging
 
+LINTABLE = 'Lintable'
+
 
 class StatusHandler(DoNothingHandler):
     """
@@ -36,7 +38,10 @@ class StatusHandler(DoNothingHandler):
         super().lint_file(uuid, linter, file)
         if self.linting_files == False:
             self.linting_files = True
-            self.github_commit.create_status(state='pending', target_url=self.target_url, description='Linting files')
+            self.github_commit.create_status(state='pending',
+                                             target_url=self.target_url,
+                                             description='Linting files',
+                                             context=LINTABLE)
 
     def report(self, uuid: UUID, report: LintReport):
         super().report(uuid, report)
@@ -44,11 +49,20 @@ class StatusHandler(DoNothingHandler):
         files_with_errors = dict((filename, errors) for filename, errors in report.errors.items() if len(errors) > 0)
 
         if len(files_with_errors) == 0:
-            self.github_commit.create_status(state='success', target_url=self.target_url, description='Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,fwe=len(files_with_errors)))
+            self.github_commit.create_status(state='success',
+                                             target_url=self.target_url,
+                                             description='Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,fwe=len(files_with_errors)),
+                                             context=LINTABLE)
         else:
-            self.github_commit.create_status(state='failure', target_url=self.target_url, description='Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,fwe=len(files_with_errors)))
+            self.github_commit.create_status(state='failure',
+                                             target_url=self.target_url,
+                                             description='Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,fwe=len(files_with_errors)),
+                                             context=LINTABLE)
 
     def started(self, uuid: UUID, comment_id: int = None):
         self.logger.error('target_url= {url}'.format(url=self.target_url))
         super().started(uuid, comment_id)
-        self.github_commit.create_status(state='pending', target_url=self.target_url, description='Starting linting process')
+        self.github_commit.create_status(state='pending',
+                                         target_url=self.target_url,
+                                         description='Starting linting process',
+                                         context=LINTABLE)
