@@ -21,6 +21,7 @@ from typing import List
 from urllib.parse import urljoin
 from uuid import uuid4, UUID
 
+import celery
 import github
 
 from lintable_db.database import DatabaseHandler
@@ -38,15 +39,16 @@ from lintable_processes.status_handler import StatusHandler
 from lintable_settings.settings import LINTWEB_SETTINGS
 
 
-@runner.task(serializer='json')
-def lint_github(payload: json, target_url: str, task_id: UUID):
+@runner.task(bind=True, serializer='json')
+def lint_github(context, payload: json, target_url: str):
     """Receive a task to lint a Github repo."""
+    task_id = context.request.id
 
     logger = logging.getLogger()
     logger.error('received payload')
 
     if 'action' not in payload:
-        return # New registrations of repos send a payload that does not have an action.
+        return  # New registrations of repos send a payload that does not have an action.
 
     if payload['action'] not in ['opened', 'synchronize', 'reopened']:
         logger.error('payload ignored...')
