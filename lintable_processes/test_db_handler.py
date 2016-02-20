@@ -26,7 +26,7 @@ from playhouse.test_utils import test_database
 from cryptography.fernet import Fernet
 
 from lintable_db.database import DatabaseHandler
-from lintable_db.models import User, Jobs, Repo, Report
+from lintable_db.models import User, Jobs, Repo, Report, ReportSummary
 from lintable_lintball.lint_error import LintError
 from lintable_lintball.lint_report import LintReport, create_from_db_query
 from lintable_processes.db_handler import DBHandler
@@ -48,6 +48,7 @@ class DBHandlerTests(unittest.TestCase):
         Jobs._meta.database = test_db
         Repo._meta.database = test_db
         Report._meta.database = test_db
+        ReportSummary._meta.database = test_db
 
         # Create local objects that can be written
         # written to the database during a test
@@ -55,7 +56,7 @@ class DBHandlerTests(unittest.TestCase):
         self.repo1 = Repo(repo_id=1, owner=self.user1,
                           url='https://github.com/user/repo.git')
 
-        for i in [User, Jobs, Repo, Report]:
+        for i in [User, Jobs, Repo, Report, ReportSummary]:
             if not i.table_exists():
                 test_db.create_table(i)
 
@@ -104,24 +105,40 @@ class DBHandlerTests(unittest.TestCase):
     def test_lint_files(self):
         with test_database(test_db, ()):
             self.db_handler.lint_file(self.uuid, 'linter', 'file')
-            self.get_and_check_job_status(status='LINT_FILES')
+            job = self.get_and_check_job_status(status='LINT_FILES')
+            report_summary = job.summaries
+
+            self.assertTrue(len(report_summary) == 1, 'report_summary should contain 1 row')
+            self.assertTrue(report_summary[0].file_name == 'file', 'file_name should be file')
+            self.assertTrue(report_summary[0].error_count == 0, 'error_count should be 0')
 
     def test_report(self):
         report = LintReport(errors=dict(a_file=[LintError(line_number=1,
                                                           column=2,
                                                           msg='Some error message')]))  # type: LintReport
+        a_file = 'a_file'
 
         with test_database(test_db, ()):
+            self.db_handler.lint_file(self.uuid, linter='', file=a_file)
             self.db_handler.report(self.uuid, report)
             job = self.get_and_check_job_status(status='REPORT')
 
             # now check that the lint_report got saved
 
             retrieved_report = create_from_db_query(job.reports)
+            summaries = job.summaries
+
             self.assertIsNotNone(retrieved_report)
             self.assertEqual(report,
                              retrieved_report,
                              'The original lint_report and the retrieved lint_report should be the same')
+
+            self.assertIsNotNone(summaries)
+            self.assertTrue(len(summaries) == 1 and
+                            summaries[0].file_name == a_file and
+                            summaries[0].error_count == 1,
+                            'ReportSummary should contain 1 row, with file_name == {a_file} and error_count == 1'
+                            .format(a_file=a_file))
 
     def test_finished(self):
         with test_database(test_db, ()):
