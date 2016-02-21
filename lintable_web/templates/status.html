@@ -81,5 +81,28 @@ limitations under the License.
       <dt>Repo</dt>
       <dd><a href="{{ job.repo.url }}">{{ job.repo.url }}</a></dd>
     </dl>
+
+    {% for summary in job.summaries %}
+      {% if loop.first %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th class="text-xs-center">Errors</th>
+            </tr>
+          </thead>
+          <tbody>
+      {% endif %}
+
+      <tr>
+        <td>{{ summary.file_name }}</td>
+        <td class="text-xs-center">{{ summary.error_count }}</td>
+      </tr>
+
+      {% if loop.last %}
+          </tbody>
+        </table>
+      {% endif %}
+    {% endfor %}
   {% endif %}
 {% endblock %}
