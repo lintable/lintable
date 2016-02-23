@@ -25,7 +25,7 @@ from lintable_lintball.lint_wrapper import LintWrapper
 class WhitespaceFileLinter(LintWrapper):
     """Detects lines in a given file with trailing whitespace."""
 
-    ws_regex = re.compile("^(.*?)(\s+)$")
+    ws_regex = re.compile(r"^(.*?)(\s+)$")
     logger = logging.getLogger(__name__)
 
     def __repr__(self):
@@ -48,10 +48,12 @@ class WhitespaceFileLinter(LintWrapper):
 
     def has_trailing_whitespace(self, line_number: int, line: str) -> List[LintError]:
         """Detects whether the given line has trailing whitespace."""
+        LOGGER = logging.getLogger()
 
         match = self.ws_regex.match(line)
-
+        LOGGER.error('line: \'{}\''.format(line))
         if match:
+            LOGGER.error('match.group(2): \'{}\''.format(match.group(2)))
             return LintError(line_number=line_number,
                              column=match.start(2) + 1,
                              msg="Found trailing whitespace: '{}'".format(match.group(1)))
@@ -63,7 +65,7 @@ class WhitespaceFileLinter(LintWrapper):
 
         try:
             with open(filename, 'r') as file:
-                lines = file.readlines()
+                lines = file.read().splitlines()
         except Exception as e:
             self.logger.error(
                 'File processing failed.\nException: \n{}'.format(e))
