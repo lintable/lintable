@@ -65,7 +65,7 @@ class WhitespaceFileLinter(LintWrapper):
 
         try:
             with open(filename, 'r') as file:
-                lines = file.readlines()
+                lines = file.read.splitlines()
         except Exception as e:
             self.logger.error(
                 'File processing failed.\nException: \n{}'.format(e))
