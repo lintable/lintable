@@ -148,8 +148,9 @@ def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
             a_file) else []
         b_results = lint(b_file, linters, handler) if os.path.exists(
             b_file) else []
-        lint_errors[filename] = [results for results in b_results if
-                                 results not in a_results]
+
+        lint_errors[filename] = [results for results in a_results if
+                                 results not in b_results]
 
     lint_report = LintReport(errors=lint_errors)
 
