@@ -138,14 +138,11 @@ def lint_process(git_handler: GitHandler,
 def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
     """Run a linter or linters."""
 
-    a_path = os.path.join(handler.temp_path, 'a')
-    b_path = os.path.join(handler.temp_path, 'b')
-
     lint_errors = {}
 
     for filename in handler.files:
-        a_file = os.path.join(a_path, filename)
-        b_file = os.path.join(b_path, filename)
+        a_file = os.path.join(handler.a_path, filename)
+        b_file = os.path.join(handler.b_path, filename)
 
         a_results = lint(a_file, linters, handler) if os.path.exists(
             a_file) else []
