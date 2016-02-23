@@ -116,7 +116,7 @@ class GitHandler(object):
         :return:
         """
 
-        self.process_handler.clone_repo(self.cloned_repo_path)
+        self.process_handler.clone_repo(self.local_path, self.cloned_repo_path, self.a_path, self.b_path)
 
         if self.remote:
             self.repo = Repo.clone_from(url=self.repo_url, to_path=self.cloned_repo_path)

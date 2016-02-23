@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from uuid import UUID
 
 from git import Commit, Repo
@@ -40,6 +41,9 @@ class ProcessHandler(object):
         self.a_commit = None
         self.b_commit = None
         self.local_path = None
+        self.repo_path = None
+        self.a_path = None
+        self.b_path = None
         self.files = []
         self.comment_id = None
 
@@ -53,15 +57,21 @@ class ProcessHandler(object):
         self.logger.started(uuid=self.uuid, comment_id=self.comment_id)
         self.db.started(uuid=self.uuid, comment_id=self.comment_id)
 
-    def clone_repo(self, local_path: str):
+    def clone_repo(self, local_path: str, repo_path: str, a_path: str, b_path: str):
         """Indicates a repo has been cloned and where that clone is located.
 
         :param local_path: The path of the cloned repo.
+        :param repo_path:
+        :param a_path:
+        :param b_path:
         :return:
         """
 
         self.state = ProcessState.CLONE_REPO
         self.local_path = local_path
+        self.repo_path = repo_path
+        self.a_path = a_path
+        self.b_path = b_path
         self.logger.clone_repo(self.uuid, self.repo, local_path)
         self.status_updater.clone_repo(self.uuid, self.repo, local_path)
         self.db.clone_repo(self.uuid, self.repo, local_path)
