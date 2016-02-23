@@ -51,7 +51,7 @@ class WhitespaceFileLinter(LintWrapper):
         LOGGER = logging.getLogger()
 
         match = self.ws_regex.match(line)
-        LOGGER.error('line: {}'.format(line))
+        LOGGER.error('line: \'{}\''.format(line))
         if match:
             return LintError(line_number=line_number,
                              column=match.start(2) + 1,
