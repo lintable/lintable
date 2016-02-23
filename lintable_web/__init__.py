@@ -106,6 +106,7 @@ if not DEBUG:
         if job.user is not current_user:
             abort(403)
 
+        LOGGER.error('returning status for job.job_id: {}'.format(job.job_id))
         return render_template('status.html', job=job)
 
     @app.route('/terms')
