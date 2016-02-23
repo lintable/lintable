@@ -138,8 +138,8 @@ def lint_process(git_handler: GitHandler,
 def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
     """Run a linter or linters."""
 
-    a_path = os.path.join(handler.local_path, 'a')
-    b_path = os.path.join(handler.local_path, 'b')
+    a_path = os.path.join(handler.temp_path, 'a')
+    b_path = os.path.join(handler.temp_path, 'b')
 
     lint_errors = {}
 
