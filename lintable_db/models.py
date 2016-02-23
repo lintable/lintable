@@ -118,7 +118,7 @@ class Repo(BaseModel):
         :return decrypted oauth token as a string:
         """
 
-        return self.owner.get_oauth_token()
+        return self.owner.get_oauth_token()   
 
 
 class Jobs(BaseModel):
