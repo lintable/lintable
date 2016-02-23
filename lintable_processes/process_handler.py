@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 from uuid import UUID
 
 from git import Commit, Repo
@@ -40,6 +41,7 @@ class ProcessHandler(object):
         self.a_commit = None
         self.b_commit = None
         self.local_path = None
+        self.temp_path = None
         self.files = []
         self.comment_id = None
 
@@ -61,7 +63,8 @@ class ProcessHandler(object):
         """
 
         self.state = ProcessState.CLONE_REPO
-        self.local_path = local_path
+        self.temp_path = local_path
+        self.local_path = os.path.join(local_path, 'repo')
         self.logger.clone_repo(self.uuid, self.repo, local_path)
         self.status_updater.clone_repo(self.uuid, self.repo, local_path)
         self.db.clone_repo(self.uuid, self.repo, local_path)
