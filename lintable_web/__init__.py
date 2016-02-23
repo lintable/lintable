@@ -99,7 +99,10 @@ if not DEBUG:
         if identifier is None:
             return render_template('status.html')
 
+        LOGGER.error('Retriving job: {}'.format(identifier))
         job = DatabaseHandler.get_job(identifier)
+        LOGGER.error('Retrieved job: {}'.format(job.job_id))
+
         if job is None:
             abort(404)
 
