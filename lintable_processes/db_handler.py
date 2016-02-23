@@ -75,7 +75,6 @@ class DBHandler(DoNothingHandler):
 
         super().lint_file(uuid, linter, file)
 
-
         if self.job.status != 'LINT_FILES':
             self.job.status = 'LINT_FILES'
             self.job.save()
