@@ -53,6 +53,7 @@ class WhitespaceFileLinter(LintWrapper):
         match = self.ws_regex.match(line)
         LOGGER.error('line: \'{}\''.format(line))
         if match:
+            LOGGER.error('match.group(2): \'{}\''.format(match.group(2)))
             return LintError(line_number=line_number,
                              column=match.start(2) + 1,
                              msg="Found trailing whitespace: '{}'".format(match.group(1)))
