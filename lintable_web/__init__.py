@@ -106,7 +106,7 @@ if not DEBUG:
         if job is None:
             abort(404)
 
-        if job.user is not current_user:
+        if job.repo_owner is not current_user:
             abort(403)
 
         LOGGER.error('returning status for job.job_id: {}'.format(job.job_id))
