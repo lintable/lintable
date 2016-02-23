@@ -50,13 +50,14 @@ class LogHandler(DoNothingHandler):
 
         self.logger.info('Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,
                                                                                      fwe=len(files_with_errors)))
-        for f, e in lint_report.errors.items():
-            if len(e) > 0:
-                self.logger.info('File {file} contains $errors errors.'.format(file=f, e=len(e)))
-                for l, c, m in e:
-                    self.logger.info('[{line}, {column}] - {message}'.format(line=l, column=c, message=m))
+        for file, errors in lint_report.errors.items():
+
+            if len(errors) > 0:
+                self.logger.info('File {file} contains {error_count} errors.'.format(file=file, error_count=len(errors)))
+                for line, column, message in errors:
+                    self.logger.info('[{line}, {column}] - {message}'.format(line=line, column=column, message=message))
             else:
-                self.logger.info('{file} contained no errors.'.format(file=f))
+                self.logger.info('{file} contained no errors.'.format(file=file))
 
     def started(self, uuid: UUID, comment_id: int = None):
         """Kicks off the process."""
