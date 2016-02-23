@@ -77,4 +77,4 @@ class LogHandler(DoNothingHandler):
         """Return the given file from the given commit."""
 
         super().retrieve_file_from_commit(uuid, file, commit)
-        self.logger.info('Retrieving {file} from {commit}'.format(file=file, commit=commit))
+        self.logger.error('Retrieving {file} from {commit}'.format(file=file, commit=commit))

@@ -74,8 +74,6 @@ class DBHandler(DoNothingHandler):
         """Called when each file is linted."""
 
         super().lint_file(uuid, linter, file)
-        file_summary = ReportSummary.create(job_id=self.job, file_name=file)
-        file_summary.save()
 
         if self.job.status != 'LINT_FILES':
             self.job.status = 'LINT_FILES'
@@ -93,6 +91,9 @@ class DBHandler(DoNothingHandler):
         """Called for each file being retrieved."""
 
         super().retrieve_file_from_commit(uuid, file, commit)
+        file_summary = ReportSummary.create(job_id=self.job, file_name=file)
+        file_summary.save()
+
         self.job.status = 'RETRIEVE_FILES'
         self.job.save()
 

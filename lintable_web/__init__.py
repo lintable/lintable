@@ -99,13 +99,17 @@ if not DEBUG:
         if identifier is None:
             return render_template('status.html')
 
+        LOGGER.error('Retriving job: {}'.format(identifier))
         job = DatabaseHandler.get_job(identifier)
+        LOGGER.error('Retrieved job: {}'.format(job.job_id))
+
         if job is None:
             abort(404)
 
-        if job.user is not current_user:
+        if job.repo_owner.github_id != current_user.github_id:
             abort(403)
 
+        LOGGER.error('returning status for job.job_id: {}'.format(job.job_id))
         return render_template('status.html', job=job)
 
     @app.route('/terms')

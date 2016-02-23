@@ -16,7 +16,7 @@ limitations under the License.
 
 {% extends "_wrapper.html" %}
 
-{% block headtitle %}Lintable | Status {% if job %}for job {{ job.job_id|e }}{% endif %}{% endblock %}
+{% block headtitle %}Lintable | Status {% if job %}for job {{ job.job_id }}{% endif %}{% endblock %}
 
 {% block pagetitle %}
   Status
