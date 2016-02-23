@@ -100,17 +100,18 @@ class DBHandlerTests(unittest.TestCase):
         with test_database(test_db, ()):
             commit = self.git_repo.head
             self.db_handler.retrieve_file_from_commit(self.uuid, 'file', commit)
-            self.get_and_check_job_status(status='RETRIEVE_FILES')
+            job = self.get_and_check_job_status(status='RETRIEVE_FILES')
 
-    def test_lint_files(self):
-        with test_database(test_db, ()):
-            self.db_handler.lint_file(self.uuid, 'linter', 'file')
-            job = self.get_and_check_job_status(status='LINT_FILES')
             report_summary = job.summaries
 
             self.assertTrue(len(report_summary) == 1, 'report_summary should contain 1 row')
             self.assertTrue(report_summary[0].file_name == 'file', 'file_name should be file')
             self.assertTrue(report_summary[0].error_count == 0, 'error_count should be 0')
+
+    def test_lint_files(self):
+        with test_database(test_db, ()):
+            self.db_handler.lint_file(self.uuid, 'linter', 'file')
+            self.get_and_check_job_status(status='LINT_FILES')
 
     def test_report(self):
         report = LintReport(errors=dict(a_file=[LintError(line_number=1,
@@ -119,7 +120,7 @@ class DBHandlerTests(unittest.TestCase):
         a_file = 'a_file'
 
         with test_database(test_db, ()):
-            self.db_handler.lint_file(self.uuid, linter='', file=a_file)
+            self.db_handler.retrieve_file_from_commit(self.uuid, file=a_file, commit=self.git_repo.head)
             self.db_handler.report(self.uuid, report)
             job = self.get_and_check_job_status(status='REPORT')
 
