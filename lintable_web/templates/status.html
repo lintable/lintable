@@ -21,7 +21,7 @@ limitations under the License.
 {% block pagetitle %}
   Status
   {% if job %}
-    for job {{ job.job_id|e }}
+    for job {{ job.job_id }}
     <small><a class="btn btn-info btn-sm" href="/status"><span class="octicon octicon-triangle-up"></span></a></small>
   {% endif %}
 {% endblock %}
