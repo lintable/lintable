@@ -149,11 +149,15 @@ def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
         b_results = lint(b_file, linters, handler) if os.path.exists(
             b_file) else []
 
+        LOGGER = logging.getLogger()
+        LOGGER.error('a_results: {}'.format(a_results))
+        LOGGER.error('b_results: {}'.format(b_results))
         lint_errors[filename] = [results for results in a_results if
                                  results not in b_results]
-
+        LOGGER.error('filename: {}'.format(filename))
+        LOGGER.error('lint_errors[filename]'.format(lint_errors[filename]))
     lint_report = LintReport(errors=lint_errors)
-
+    LOGGER.error('lint_report: {}'.format(lint_report))
     handler.report(lint_report)
 
     handler.finish()
