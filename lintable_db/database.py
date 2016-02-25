@@ -36,8 +36,10 @@ class DatabaseHandler:
         try:
             if isinstance(identifier, int):
                 repo = Repo.get(Repo.repo_id == identifier)
-            if isinstance(identifier, str):
+            elif isinstance(identifier, str):
                 repo = Repo.get(Repo.url == identifier)
+            else:
+                repo = None
         except Repo.DoesNotExist as e:
             repo = None
             logger.error(
