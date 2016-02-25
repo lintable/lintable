@@ -19,9 +19,7 @@ import logging
 import os
 from typing import List
 from urllib.parse import urljoin
-from uuid import uuid4, UUID
 
-import celery
 import github
 
 from lintable_db.database import DatabaseHandler
