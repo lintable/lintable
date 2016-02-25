@@ -10,5 +10,6 @@ Authors
 * Ian Copp [i-c](https://github.com/i-c)
 * Harley Hauer [hhauer](https://github.com/hhauer)
 * Mark Kirby [mkirby111](https://github.com/mkirby111)
+* JJ Berry [bjjerry](https://github.com/bjjerry)
 
 Contributors

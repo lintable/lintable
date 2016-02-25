@@ -57,8 +57,8 @@ def entry(repo: sys.path, commit_a: str, commit_b: str):
     It then setups a log handler, a git handler and
     sends them to lint_process
     :param repo: the path of the repository to be linted
+    :param commit_a: the commit to be comapred with, defaults to HEAD
     :param commit_b: the commit to be comapred against, defaults to HEAD~1
-    :param_commit_a: the commit to be comapred with, defaults to HEAD
     :return: int - Should return a 0 to indicate this was a success.
     """
     if len(sys.argv) < 2:

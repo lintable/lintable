@@ -16,7 +16,7 @@
 
 import logging
 from typing import Union
-from uuid import uuid4, UUID
+from uuid import UUID
 
 from lintable_db.models import User, Repo, Jobs
 
@@ -36,8 +36,10 @@ class DatabaseHandler:
         try:
             if isinstance(identifier, int):
                 repo = Repo.get(Repo.repo_id == identifier)
-            if isinstance(identifier, str):
+            elif isinstance(identifier, str):
                 repo = Repo.get(Repo.url == identifier)
+            else:
+                repo = None
         except Repo.DoesNotExist as e:
             repo = None
             logger.error(
@@ -59,8 +61,10 @@ class DatabaseHandler:
         try:
             if isinstance(identifier, int):
                 user = User.get(User.github_id == identifier)
-            if isinstance(identifier, str):
+            elif isinstance(identifier, str):
                 user = User.get(User.username == identifier)
+            else:
+                user = None
         except User.DoesNotExist as e:
             user = None
             logger.error(
@@ -71,7 +75,8 @@ class DatabaseHandler:
             logger.error(e)
         return user
 
-    def set_job_status(self, job_id: int, status: str) -> int:
+    @staticmethod
+    def set_job_status(job_id: int, status: str) -> int:
         """Updates job status to provided string.
 
         :param job_id:
