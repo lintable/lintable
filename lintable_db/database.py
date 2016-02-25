@@ -71,7 +71,8 @@ class DatabaseHandler:
             logger.error(e)
         return user
 
-    def set_job_status(self, job_id: int, status: str) -> int:
+    @staticmethod
+    def set_job_status(job_id: int, status: str) -> int:
         """Updates job status to provided string.
 
         :param job_id:
