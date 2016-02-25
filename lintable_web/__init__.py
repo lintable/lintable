@@ -17,10 +17,9 @@
 import json
 import logging
 import urllib.parse
-from datetime import datetime
 
 import requests
-from flask import (Flask, request, render_template, redirect, url_for, session,
+from flask import (Flask, request, render_template, redirect, url_for,
                    abort, flash)
 from flask_login import (LoginManager, login_user, login_required, logout_user,
                          current_user)
