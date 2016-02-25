@@ -20,7 +20,7 @@ from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
                     DateTimeField, CharField, UUIDField, PostgresqlDatabase)
-from simplecrypt import decrypt, encrypt, EncryptionException
+from simplecrypt import EncryptionException
 from cryptography.fernet import Fernet
 
 from lintable_db.fields import OauthField

@@ -16,7 +16,7 @@
 
 import logging
 from typing import Union
-from uuid import uuid4, UUID
+from uuid import UUID
 
 from lintable_db.models import User, Repo, Jobs
 
