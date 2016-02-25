@@ -61,8 +61,10 @@ class DatabaseHandler:
         try:
             if isinstance(identifier, int):
                 user = User.get(User.github_id == identifier)
-            if isinstance(identifier, str):
+            elif isinstance(identifier, str):
                 user = User.get(User.username == identifier)
+            else:
+                user = None
         except User.DoesNotExist as e:
             user = None
             logger.error(
