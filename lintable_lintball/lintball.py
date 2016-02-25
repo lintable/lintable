@@ -139,6 +139,7 @@ def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
     """Run a linter or linters."""
 
     lint_errors = {}
+    LOGGER = logging.getLogger()
 
     for filename in handler.files:
         a_file = os.path.join(handler.a_path, filename)
@@ -149,7 +150,6 @@ def lintball(handler: ProcessHandler, linters: List[LintWrapper]):
         b_results = lint(b_file, linters, handler) if os.path.exists(
             b_file) else []
 
-        LOGGER = logging.getLogger()
         LOGGER.error('a_results: {}'.format(a_results))
         LOGGER.error('b_results: {}'.format(b_results))
         lint_errors[filename] = [results for results in a_results if
