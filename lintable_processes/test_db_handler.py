@@ -65,10 +65,9 @@ class DBHandlerTests(unittest.TestCase):
 
         self.db_handler = DBHandler(repo_id=self.repo1.repo_id)
         self.uuid = uuid4()
-        self.comment_number = 42
         self.tmp_dir = tempfile.mkdtemp()
         self.git_repo = git.Repo.init(path=self.tmp_dir, mkdir=False)
-        self.db_handler.started(self.uuid, self.comment_number)
+        self.db_handler.started(self.uuid)
 
     def tearDown(self):
 
@@ -88,7 +87,7 @@ class DBHandlerTests(unittest.TestCase):
 
     def test_started(self):
         with test_database(test_db, ()):
-            self.db_handler.started(self.uuid, self.comment_number)
+            self.db_handler.started(self.uuid)
             self.get_and_check_job_status(status='STARTED')
 
     def test_clone_repo(self):

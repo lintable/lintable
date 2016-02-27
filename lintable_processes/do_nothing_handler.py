@@ -26,7 +26,7 @@ class DoNothingHandler(object):
     def __init__(self):
         pass
 
-    def started(self, uuid: UUID, comment_id: int = None):
+    def started(self, uuid: UUID):
         """Kicks off the process."""
 
         return

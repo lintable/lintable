@@ -44,7 +44,6 @@ class ProcessHandler(object):
         self.a_path = None
         self.b_path = None
         self.files = []
-        self.comment_id = None
 
     def started(self):
         """Kicks off the process.
@@ -52,9 +51,8 @@ class ProcessHandler(object):
         :return:
         """
 
-        self.comment_id = self.status_updater.started(uuid=self.uuid)
-        self.logger.started(uuid=self.uuid, comment_id=self.comment_id)
-        self.db.started(uuid=self.uuid, comment_id=self.comment_id)
+        self.logger.started(uuid=self.uuid)
+        self.db.started(uuid=self.uuid)
 
     def clone_repo(self, local_path: str, repo_path: str, a_path: str, b_path: str):
         """Indicates a repo has been cloned and where that clone is located.
