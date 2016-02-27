@@ -59,13 +59,11 @@ class LogHandler(DoNothingHandler):
             else:
                 self.logger.info('{file} contained no errors.'.format(file=file))
 
-    def started(self, uuid: UUID, comment_id: int = None):
+    def started(self, uuid: UUID):
         """Kicks off the process."""
 
-        super().started(uuid, comment_id)
+        super().started(uuid)
         self.logger.info('Starting linting process with id: {uuid}'.format(uuid=uuid))
-        if type(comment_id) is int and comment_id >= 0:
-            self.logger.debug('Comment id is {comment_id}'.format(comment_id=comment_id))
 
     def clone_repo(self, uuid: UUID, repo: Repo, local_path: str):
         """Indicates a repo has been cloned and where that clone is located."""

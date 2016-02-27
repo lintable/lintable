@@ -36,7 +36,7 @@ class StatusHandler(DoNothingHandler):
 
     def lint_file(self, uuid: UUID, linter: str, file: str):
         super().lint_file(uuid, linter, file)
-        if self.linting_files == False:
+        if not self.linting_files:
             self.linting_files = True
             self.github_commit.create_status(state='pending',
                                              target_url=self.target_url,
@@ -59,9 +59,9 @@ class StatusHandler(DoNothingHandler):
                                              description='Total number of files processed: {nof}\t Files with errors: {fwe}'.format(nof=num_of_files,fwe=len(files_with_errors)),
                                              context=LINTABLE)
 
-    def started(self, uuid: UUID, comment_id: int = None):
+    def started(self, uuid: UUID):
         self.logger.error('target_url= {url}'.format(url=self.target_url))
-        super().started(uuid, comment_id)
+        super().started(uuid)
         self.github_commit.create_status(state='pending',
                                          target_url=self.target_url,
                                          description='Starting linting process',

@@ -57,10 +57,10 @@ class DBHandler(DoNothingHandler):
             summary.error_count = len(lint_report.errors[summary.file_name])
             summary.save()
 
-    def started(self, uuid: UUID, comment_id: int = None):
+    def started(self, uuid: UUID):
         """Kicks off the process."""
 
-        super().started(uuid, comment_id)
+        super().started(uuid)
         self.repo_fk = DatabaseHandler.get_repo(identifier=self.repo_id)
         self.job = Jobs.create(job_id=uuid,
                                repo_owner=self.repo_fk.owner_id,
