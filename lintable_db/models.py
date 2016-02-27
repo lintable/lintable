@@ -20,7 +20,6 @@ from urllib.parse import urlparse
 
 from peewee import (Model, PrimaryKeyField, IntegerField, ForeignKeyField,
                     DateTimeField, CharField, UUIDField, PostgresqlDatabase)
-from simplecrypt import EncryptionException
 from cryptography.fernet import Fernet
 
 from lintable_db.fields import OauthField
@@ -93,14 +92,9 @@ class User(BaseModel):
         """Override the default save method for a Model."""
 
         if self.token.__class__ == str:
-            try:
-                encrypter = Fernet(
-                    LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
-                self.token = encrypter.encrypt(bytes(self.token, 'utf8'))
-            except EncryptionException as e:
-                print('Unable to encrypt OAuth token. User not saved'\
-                      'Exception: \n{}'.format(e))
-                return None
+            encrypter = Fernet(
+                LINTWEB_SETTINGS['simple-crypt']['ENCRYPTION_KEY'])
+            self.token = encrypter.encrypt(bytes(self.token, 'utf8'))
         return super(User, self).save(*args, **kwargs)
 
 
