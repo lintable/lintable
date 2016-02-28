@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from typing import List
 from uuid import UUID
 
 from git import Commit, Repo
@@ -22,21 +22,19 @@ from lintable_lintball.lint_report import LintReport
 from lintable_processes.do_nothing_handler import DoNothingHandler
 from lintable_processes.process_state import ProcessState
 
+
 class ProcessHandler(object):
     """Handles the linting process, between the GitHandler and Lintball.
 
     It tracks the state of the process and delegates to side-effecting code
-    for logging, db persistence, and website commenting.
+    for logging, db persistence, and GitHub status updates.
     """
 
-    def __init__(self, uuid: UUID, repo: Repo, logger=DoNothingHandler(),
-                 status_handler=DoNothingHandler(), db=DoNothingHandler()):
+    def __init__(self, uuid: UUID, repo: Repo, handlers: List[DoNothingHandler]):
         self.state = ProcessState.STARTED
         self.uuid = uuid
         self.repo = repo
-        self.logger = logger
-        self.status_updater = status_handler
-        self.db = db
+        self.handlers = handlers
         self.a_commit = None
         self.b_commit = None
         self.local_path = None
@@ -50,9 +48,8 @@ class ProcessHandler(object):
 
         :return:
         """
-
-        self.logger.started(uuid=self.uuid)
-        self.db.started(uuid=self.uuid)
+        for h in self.handlers:
+            h.started(uuid=self.uuid)
 
     def clone_repo(self, local_path: str, repo_path: str, a_path: str, b_path: str):
         """Indicates a repo has been cloned and where that clone is located.
@@ -69,9 +66,10 @@ class ProcessHandler(object):
         self.repo_path = repo_path
         self.a_path = a_path
         self.b_path = b_path
-        self.logger.clone_repo(self.uuid, self.repo, local_path)
-        self.status_updater.clone_repo(self.uuid, self.repo, local_path)
-        self.db.clone_repo(self.uuid, self.repo, local_path)
+
+        for h in self.handlers:
+            h.clone_repo(self.uuid, self.repo, local_path)
+
         return
 
     def retrieve_changed_file_set(self, a_commit: Commit, b_commit: Commit):
@@ -85,9 +83,10 @@ class ProcessHandler(object):
         self.state = ProcessState.RETRIEVE_FILES
         self.a_commit = a_commit
         self.b_commit = b_commit
-        self.logger.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
-        self.status_updater.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
-        self.db.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
+
+        for h in self.handlers:
+            h.retrieve_changed_file_set(self.uuid, a_commit, b_commit)
+
         return
 
     def retrieve_file_from_commit(self, file: str, commit: Commit):
@@ -100,9 +99,10 @@ class ProcessHandler(object):
 
         # track which files we have retrieved
         self.files.append(file)
-        self.logger.retrieve_file_from_commit(self.uuid, file, commit)
-        self.status_updater.retrieve_file_from_commit(self.uuid, file, commit)
-        self.db.retrieve_file_from_commit(self.uuid, file, commit)
+
+        for h in self.handlers:
+            h.retrieve_file_from_commit(self.uuid, file, commit)
+
         return
 
     def lint_file(self, linter: str, file: str):
@@ -114,9 +114,10 @@ class ProcessHandler(object):
         """
 
         self.state = ProcessState.LINT_FILES
-        self.logger.lint_file(self.uuid, linter, file)
-        self.status_updater.lint_file(self.uuid, linter, file)
-        self.db.lint_file(self.uuid, linter, file)
+
+        for h in self.handlers:
+            h.lint_file(self.uuid, linter, file)
+
         return
 
     def report(self, report: LintReport):
@@ -127,9 +128,10 @@ class ProcessHandler(object):
         """
 
         self.state = ProcessState.REPORT
-        self.logger.report(self.uuid, report)
-        self.status_updater.report(self.uuid, report)
-        self.db.report(self.uuid, report)
+
+        for h in self.handlers:
+            h.report(self.uuid, report)
+
         return
 
     def finish(self):
@@ -139,7 +141,8 @@ class ProcessHandler(object):
         """
 
         self.state = ProcessState.FINISHED
-        self.logger.finish(self.uuid)
-        self.status_updater.finish(self.uuid)
-        self.db.finish(self.uuid)
+
+        for h in self.handlers:
+            h.finish(self.uuid)
+
         return

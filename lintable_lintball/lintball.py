@@ -95,14 +95,13 @@ def lint_github(context, payload: json, target_url: str):
 
     github_commit = github_repo.get_commit(sha1_a)
 
-
     logger.error('target_url for status: {target_url}'.format(target_url=target_url))
 
     process_handler = ProcessHandler(repo=repo_url,
                                      uuid=task_id,
-                                     status_handler=StatusHandler(github_commit=github_commit, target_url=target_url),
-                                     logger=LogHandler(logger),
-                                     db=DBHandler(repo_id=repo_id))
+                                     handlers=[StatusHandler(github_commit=github_commit, target_url=target_url),
+                                               LogHandler(logger),
+                                               DBHandler(repo_id=repo_id)])
 
     git_handler = GitHandler(process_handler=process_handler,
                              repo_url=repo_url,
