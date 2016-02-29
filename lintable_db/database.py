@@ -18,7 +18,7 @@ import logging
 from typing import Union
 from uuid import UUID
 
-from lintable_db.models import User, Repo, Jobs
+from lintable_db.models import User, Repo, Jobs, AcmeChallengeResponse
 
 logger = logging.getLogger(__name__)
 
@@ -120,3 +120,19 @@ class DatabaseHandler:
             logger.error(e)
 
         return job
+
+    @staticmethod
+    def get_acme_response(identifier: str) -> str:
+        """Look up an ACME response by challenge identifier.
+
+        The value must already be in the database.
+
+        :param identifier: CA-provided challenge ID.
+        :return str: CA-provided challenge response."""
+        try:
+          return AcmeChallengeResponse.get(
+              AcmeChallengeResponse.challenge_identifier == identifier
+            ).challenge_response
+        except Exception as e:
+            logger.error(e)
+            return "Challenge identifier not found."

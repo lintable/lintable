@@ -159,3 +159,9 @@ class GithubString(BaseModel):
     """A test state placeholder."""
 
     state_string = CharField()
+
+class AcmeChallengeResponse(BaseModel):
+    """A challenge and associated response, for use with an ACME CA."""
+
+    challenge_identifier = CharField()
+    challenge_response = CharField()

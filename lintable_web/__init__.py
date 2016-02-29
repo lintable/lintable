@@ -231,6 +231,11 @@ if not DEBUG:
         LOGGER.error('url_for(\'account\'): {}'.format( url_for('account')))
         return redirect(request.args.get('next') or url_for('account'))
 
+    @app.route('/.well-known/acme-challenge/<identifier>')
+    def letsencrypt(identifier=None):
+        """Respond to a letsencrypt ACME challenge."""
+        return DatabaseHandler.get_acme_response(identifier)
+
 ################################################################################
 # Start the server
 ################################################################################
