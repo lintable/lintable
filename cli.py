@@ -73,7 +73,7 @@ def entry(repo: sys.path, commit_a: str, commit_b: str):
         logger.setLevel('INFO')
 
         # create a process handler that delegates to the logger
-        process_handler = ProcessHandler(logger=LogHandler(logger=logger), uuid=uuid4(), repo=git_repo)
+        process_handler = ProcessHandler(handlers=[LogHandler(logger=logger)], uuid=uuid4(), repo=git_repo)
 
         # create a git handler to clone the repo and comapre the two commits
         git_handler = GitHandler(process_handler, git_repo, commit_a, commit_b)

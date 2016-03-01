@@ -66,7 +66,7 @@ class GitHandlerTests(unittest.TestCase):
         # commit file a as commit a
         self.commit_a = self.commit_files(a_file, msg='commit a')
 
-        self.git_handler = GitHandler(ProcessHandler(self.tmp_repo, uuid4()),
+        self.git_handler = GitHandler(ProcessHandler(repo=self.tmp_repo, uuid=uuid4(), handlers=[]),
                                       self.tmp_repo,
                                       self.commit_a.hexsha,
                                       self.commit_b.hexsha)
