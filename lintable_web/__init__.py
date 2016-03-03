@@ -178,7 +178,7 @@ if not DEBUG:
         return redirect(url, code=302)
 
 
-    @app.route('list_repositories')
+    @app.route('/list_repositories')
     @login_required
     def list_repos():
         """List repositories for a given owner."""
