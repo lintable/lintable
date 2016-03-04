@@ -207,8 +207,11 @@ if not DEBUG:
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
             webhook = dict(id=repo.id) in webhooks
-            repos.append(dict(full_name=full_name, webhook=False))
-            LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
+            repos.append(dict(full_name=full_name, webhook=webhook))
+
+        for repo in repos:
+            LOGGER.error('full_name: {full_name}\twebhook?: {webhook}'.format(full_name=repo['full_name'],
+                                                                              webhook=repo['webhook']))
 
         return render_template('list_repos.html', repos=repos)
 
