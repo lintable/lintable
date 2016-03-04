@@ -196,7 +196,7 @@ if not DEBUG:
                             client_secret=client_secret)
 
         repos = []
-        webhooks = current_user.repos(Repo.id).dict()
+        webhooks = current_user.repos(Repo.id).dicts()
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
