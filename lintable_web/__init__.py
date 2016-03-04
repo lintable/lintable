@@ -182,7 +182,11 @@ if not DEBUG:
     @login_required
     def list_repos():
         """List repositories for a given owner."""
-        LOGGER.error('current_user: {github_id}', github_id=current_user.github_id)
+        try:
+            LOGGER.error('current_user: {github_id}', github_id=current_user.github_id)
+        except Exception as e:
+            LOGGER.error('caught exception when getting github_id: {e}', e=e)
+
         oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
         client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
 
