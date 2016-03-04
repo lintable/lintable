@@ -210,7 +210,7 @@ if not DEBUG:
             repos.append(dict(full_name=full_name, webhook=False))
             LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
 
-        return render_template('account.html', current_user=current_user)
+        return render_template('list_repos.html', repos=repos)
 
 
     @app.route('/logout')
