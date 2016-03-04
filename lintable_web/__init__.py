@@ -210,8 +210,8 @@ if not DEBUG:
             repos.append(dict(full_name=full_name, webhook=webhook))
 
         for repo in repos:
-            LOGGER.error('full_name: {full_name}\twebhook?: {webhook}'.format(full_name=repo['full_name'],
-                                                                              webhook=repo['webhook']))
+            LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=repo['full_name'],
+                                                                                webhook=repo['webhook']))
 
         return render_template('list_repos.html', repos=repos)
 
