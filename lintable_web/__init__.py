@@ -182,29 +182,26 @@ if not DEBUG:
     @login_required
     def list_repos():
         """List repositories for a given owner."""
-        try:
-            LOGGER.error('current_user is None: {}'.format(current_user is None))
-            github_id = current_user.github_id
-            LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
-        except Exception as e:
-            LOGGER.error('caught exception when getting github_id: {e}'.format(e=e))
 
-        # oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
-        # client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
-        #
-        # client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
-        #
-        # github_api = Github(login_or_token=oauth_key,
-        #                     client_id=client_id,
-        #                     client_secret=client_secret)
-        #
-        # repos = []
-        #
-        # for repo in github_api.get_user().get_repos(type='owner'):
-        #     full_name = repo.full_name
-        #     webhook = DatabaseHandler.get_repo(repo.id)
-        #     repos.append(dict(full_name=full_name, webhook=webhook))
-        #     LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}', full_name=full_name, webhook=webhook)
+        github_id = current_user.github_id
+        LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
+
+        oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
+        client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
+
+        client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
+
+        github_api = Github(login_or_token=oauth_key,
+                            client_id=client_id,
+                            client_secret=client_secret)
+
+        repos = []
+
+        for repo in github_api.get_user().get_repos(type='owner'):
+            full_name = repo.full_name
+            webhook = DatabaseHandler.get_repo(repo.id)
+            repos.append(dict(full_name=full_name, webhook=webhook))
+            LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
 
         return 'success'
 
