@@ -205,7 +205,7 @@ if not DEBUG:
         #     repos.append(dict(full_name=full_name, webhook=webhook))
         #     LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}', full_name=full_name, webhook=webhook)
 
-        return '<html/>'
+        return 'success'
 
 
     @app.route('/logout')
