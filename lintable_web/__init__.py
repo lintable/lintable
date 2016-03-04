@@ -196,10 +196,11 @@ if not DEBUG:
                             client_secret=client_secret)
 
         repos = []
+        webhooks = current_user.repos
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
-            webhooks = current_user.repos
+            webhook = repo.id in webhooks.repo_id
             LOGGER.error('webhooks: {}'.format(webhooks))
             repos.append(dict(full_name=full_name, webhook=False))
             LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
