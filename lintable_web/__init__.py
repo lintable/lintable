@@ -202,14 +202,15 @@ if not DEBUG:
             webhooks = []
             LOGGER.error('failed to get repo from database with exception {e}'.format(e=e))
 
+        LOGGER.error('webhooks: {}'.format(webhooks))
+
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
             webhook = dict(id=repo.id) in webhooks
-            LOGGER.error('webhooks: {}'.format(webhooks))
             repos.append(dict(full_name=full_name, webhook=False))
             LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
 
-        return render_template('list_repos.html', repos=repos)
+        return render_template('account.html', current_user=current_user)
 
 
     @app.route('/logout')
