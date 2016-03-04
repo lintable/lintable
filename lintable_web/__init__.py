@@ -199,8 +199,9 @@ if not DEBUG:
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
-            webhook = DatabaseHandler.get_repo(repo.id) is not None
-            repos.append(dict(full_name=full_name, webhook=webhook))
+            webhooks = current_user.repos
+            LOGGER.error('webhooks: {}'.format(webhooks))
+            repos.append(dict(full_name=full_name, webhook=False))
             LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}'.format(full_name=full_name, webhook=webhook))
 
         return 'success'
