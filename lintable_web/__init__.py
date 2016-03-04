@@ -188,22 +188,22 @@ if not DEBUG:
         except Exception as e:
             LOGGER.error('caught exception when getting github_id: {e}', e=e)
 
-        oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
-        client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
-
-        client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
-
-        github_api = Github(login_or_token=oauth_key,
-                            client_id=client_id,
-                            client_secret=client_secret)
-
-        repos = []
-
-        for repo in github_api.get_user().get_repos(type='owner'):
-            full_name = repo.full_name
-            webhook = DatabaseHandler.get_repo(repo.id)
-            repos.append(dict(full_name=full_name, webhook=webhook))
-            LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}', full_name=full_name, webhook=webhook)
+        # oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
+        # client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
+        #
+        # client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
+        #
+        # github_api = Github(login_or_token=oauth_key,
+        #                     client_id=client_id,
+        #                     client_secret=client_secret)
+        #
+        # repos = []
+        #
+        # for repo in github_api.get_user().get_repos(type='owner'):
+        #     full_name = repo.full_name
+        #     webhook = DatabaseHandler.get_repo(repo.id)
+        #     repos.append(dict(full_name=full_name, webhook=webhook))
+        #     LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}', full_name=full_name, webhook=webhook)
 
         return '<html/>'
 
