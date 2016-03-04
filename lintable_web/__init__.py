@@ -197,7 +197,7 @@ if not DEBUG:
 
         repos = []
         try:
-            webhooks = Repo.select(Repo.id).where(owner_id=github_id).dicts()
+            webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
         except Exception as e:
             webhooks = []
             LOGGER.error('failed to get repo from database with exception {e}'.format(e=e))
