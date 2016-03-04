@@ -213,7 +213,7 @@ if not DEBUG:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=repo['full_name'],
                                                                                 webhook=repo['webhook']))
 
-        return render_template('list_repos.html', repos=repos)
+        return render_template('list_repos.html', current_user=current_user, repos=repos)
 
 
     @app.route('/logout')
