@@ -178,12 +178,13 @@ if not DEBUG:
         return redirect(url, code=302)
 
 
-    @app.route('/list_repositories')
+    @app.route('/list/repositories')
     @login_required
     def list_repos():
         """List repositories for a given owner."""
         try:
-            LOGGER.error('current_user: {github_id}', github_id=current_user.github_id)
+            github_id = current_user.github_id
+            LOGGER.error('current_user: {github_id}', github_id=github_id)
         except Exception as e:
             LOGGER.error('caught exception when getting github_id: {e}', e=e)
 
