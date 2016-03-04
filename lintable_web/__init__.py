@@ -183,6 +183,7 @@ if not DEBUG:
     def list_repos():
         """List repositories for a given owner."""
         try:
+            LOGGER.error('current_user is None: {}', current_user is None)
             github_id = current_user.github_id
             LOGGER.error('current_user: {github_id}', github_id=github_id)
         except Exception as e:
