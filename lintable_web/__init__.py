@@ -196,7 +196,11 @@ if not DEBUG:
                             client_secret=client_secret)
 
         repos = []
-        webhooks = current_user.repos(Repo.id).dicts()
+        try:
+            webhooks = current_user.repos(Repo.id).dicts()
+        except Exception as e:
+            webhooks = []
+            LOGGER.error('failed to get repo from database with exception {e}'.format(e=e))
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
