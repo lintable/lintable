@@ -22,7 +22,9 @@ limitations under the License.
 {% block content %}
   {% for repo in repos %}
     <ul class="list-group">
-      <li class="list-group-item">{{ repo['full_name'] }}</li>
+      <li class="list-group-item">
+          <input type="checkbox" name={{ repo.full_name }} value={{ repo.webhook }}>{{ repo.full_name }}
+      </li>
     </ul>
   {% endfor %}
 {% endblock %}
