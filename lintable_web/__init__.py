@@ -216,7 +216,7 @@ if not DEBUG:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=repo['full_name'],
                                                                                 webhook=repo['webhook']))
         try:
-            form.webhooks.choices = [repo.full_name for repo in repos]
+            form.webhooks.choices = [repo['full_name'] for repo in repos]
         except Exception as e:
             LOGGER.error('failed to fill in webhooks form with exception {e}'.format(e=e))
 
