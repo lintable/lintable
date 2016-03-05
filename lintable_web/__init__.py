@@ -196,10 +196,10 @@ if not DEBUG:
                             client_id=client_id,
                             client_secret=client_secret)
 
-        form = WebhookForm()
         repos = []
 
         try:
+            form = WebhookForm()
             webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
         except Exception as e:
             webhooks = []
