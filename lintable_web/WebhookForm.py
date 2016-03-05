@@ -15,13 +15,6 @@
 from wtforms import Form, widgets, SelectMultipleField, SubmitField
 
 
-class RepoWebhook(object):
-
-    def __init__(self, full_name: str, webhook: bool):
-        self.full_name = full_name
-        self.webhook = webhook
-
-
 class MultiCheckboxField(SelectMultipleField):
     """A multiple-select, except displays a list of checkboxes.
 
@@ -34,4 +27,4 @@ class MultiCheckboxField(SelectMultipleField):
 
 class WebhookForm(Form):
     webhooks = MultiCheckboxField()
-    submit = SubmitField()
+ #   submit = SubmitField()
