@@ -20,4 +20,5 @@ PyGithub==1.26.0
 click==6.2
 rstr==2.2.3
 flask-login==0.3.2
+flask-wtf==0.12
 cryptography==1.2.2
