@@ -30,6 +30,7 @@ from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, database, Repo
 from lintable_settings.settings import LINTWEB_SETTINGS
 from lintable_lintball import lintball
+from lintable_web.WebhookForm import WebhookForm
 
 app = Flask(__name__)  # pylint: disable=invalid-name
 app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
@@ -178,7 +179,7 @@ if not DEBUG:
         return redirect(url, code=302)
 
 
-    @app.route('/list/repositories')
+    @app.route('/list/repositories', methods=('GET', 'POST'))
     @login_required
     def list_repos():
         """List repositories for a given owner."""
@@ -195,7 +196,9 @@ if not DEBUG:
                             client_id=client_id,
                             client_secret=client_secret)
 
+        form = WebhookForm()
         repos = []
+
         try:
             webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
         except Exception as e:
@@ -213,7 +216,12 @@ if not DEBUG:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=repo['full_name'],
                                                                                 webhook=repo['webhook']))
 
-        return render_template('list_repos.html', current_user=current_user, repos=repos)
+        form.webhooks.choices = [repo.full_name for repo in repos]
+
+        if form.validate():
+            pass
+
+        return render_template('list_repos.html', current_user=current_user, form=form)
 
 
     @app.route('/logout')

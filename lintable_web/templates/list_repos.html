@@ -16,15 +16,13 @@ limitations under the License.
 
 {% extends "_wrapper.html" %}
 
+{% from "_formhelpers.html" import render_field %}
+
 {% block headtitle %}Lintable | Repositories{% endblock %}
 {% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
 {% block content %}
-  {% for repo in repos %}
-    <ul class="list-group">
-      <li class="list-group-item">
-          <input type="checkbox" name={{ repo.full_name }} value={{ repo.webhook }}>{{ repo.full_name }}
-      </li>
-    </ul>
-  {% endfor %}
+    {{ render_field(form.webhooks) }}
+    <p/>
+    {{ render_field(form.submit) }}
 {% endblock %}
