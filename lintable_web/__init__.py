@@ -197,7 +197,7 @@ if not DEBUG:
                             client_secret=client_secret)
 
         form = WebhookForm()
-        repos = []
+        repos = {}
 
         try:
             webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
@@ -210,15 +210,12 @@ if not DEBUG:
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
             webhook = dict(id=repo.id) in webhooks
-            repos.append(dict(full_name=full_name, webhook=webhook))
+            repos[full_name] = webhook
 
-        for repo in repos:
-            LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=repo['full_name'],
-                                                                                webhook=repo['webhook']))
-        try:
-            form.webhooks.choices = [repo['full_name'] for repo in repos]
-        except Exception as e:
-            LOGGER.error('failed to fill in webhooks form with exception {e}'.format(e=e))
+        for full_name, webhook in repos:
+            LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
+                                                                                webhook=webhook))
+        form.webhooks.choices = repos.keys()
 
         if form.validate():
             pass
