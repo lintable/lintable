@@ -18,13 +18,15 @@ limitations under the License.
 
 {% from "_formhelpers.html" import render_field %}
 
-<form>
+{% block headtitle %}Lintable | Repositories{% endblock %}
+{% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
-    {% block headtitle %}Lintable | Repositories{% endblock %}
-    {% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
+{% block content %}
 
-    {% block content %}
+    <form method=post action="/list/repositories">
+
         {{ render_field(form.webhooks) }}
-    {% endblock %}
 
-</form>
+    </form>
+
+{% endblock %}
