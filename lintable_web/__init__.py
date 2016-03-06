@@ -212,7 +212,7 @@ if not DEBUG:
             webhook = dict(id=repo.id) in webhooks
             repos[full_name] = webhook
 
-        for full_name, webhook in repos:
+        for full_name, webhook in repos.items():
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=webhook))
         form.webhooks.choices = repos.keys()
