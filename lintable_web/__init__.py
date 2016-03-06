@@ -217,7 +217,13 @@ if not DEBUG:
                                                                                 webhook=webhook))
         form.webhooks.choices = repos.keys()
 
-        return render_template('list_repos.html', current_user=current_user, form=form)
+        try:
+            result = render_template('list_repos.html', current_user=current_user, form=form)
+        except Exception as e:
+            result = ''
+            LOGGER.error('failed to render html with {e}'.format(e=e))
+
+        return result
 
 
     @app.route('/logout')
