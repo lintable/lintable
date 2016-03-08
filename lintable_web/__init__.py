@@ -196,7 +196,7 @@ if not DEBUG:
                             client_id=client_id,
                             client_secret=client_secret)
 
-        form = WebhookForm()
+        form = WebhookForm(request.form)
         repos = {}
 
         try:
