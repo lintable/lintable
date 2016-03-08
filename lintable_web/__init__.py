@@ -219,6 +219,9 @@ if not DEBUG:
         for full_name, webhook in repos.items():
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=webhook))
+
+        form.webhooks.choices = [(full_name, full_name) for full_name, webhook in repos.items()]
+
         if request.method == 'POST' and form.validate():
             LOGGER.error('checking for updates')
             LOGGER.error('webhooks: {}'.format(repr(form.webhooks)))
@@ -237,10 +240,9 @@ if not DEBUG:
 
             LOGGER.error('webhooks to add: {}'.format(add_webhooks))
             LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
-
         else:
             LOGGER.error('presenting form')
-            form.webhooks.choices = [(webhook, full_name) for full_name, webhook in repos.items()]
+
 
         try:
             result = render_template('list_repos.html', current_user=current_user, form=form)
