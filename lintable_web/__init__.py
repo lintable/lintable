@@ -183,7 +183,7 @@ if not DEBUG:
     @login_required
     def list_repos():
         """List repositories for a given owner."""
-
+        LOGGER.error('request: {}'.format(repr(request)))
         github_id = current_user.github_id
         LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
 
