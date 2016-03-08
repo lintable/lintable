@@ -219,14 +219,15 @@ if not DEBUG:
             LOGGER.error('checking for updates')
             add_webhooks = set()
             remove_webhooks = set()
-            for checkbox in form.webhooks:
-                LOGGER.error('examining {}: {}'.format(checkbox.label, checkbox.checked))
-                result = repos[checkbox.label]
-                if result is not None and result.webhook is not checkbox.checked:
-                    if result.webhook:
-                        add_webhooks.add(checkbox.label)
-                    else:
-                        remove_webhooks.add(checkbox.label)
+            for choice in form.webhooks.choices:
+                LOGGER.error('examining {}: {}'.format(choice))
+#                result = repos[checkbox.label]
+#                if result is not None and result.webhook is not checkbox.checked:
+
+#                   if result.webhook:
+#                        add_webhooks.add(checkbox.label)
+#                    else:
+#                        remove_webhooks.add(checkbox.label)
 
             LOGGER.error('webhooks to add: {}'.format(add_webhooks))
             LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
