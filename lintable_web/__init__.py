@@ -204,21 +204,21 @@ if not DEBUG:
         repos = {}
 
         try:
-            webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
+            has_webhooks = Repo.select(Repo.id).where(Repo.owner == github_id).dicts()
         except Exception as e:
-            webhooks = []
+            has_webhooks = []
             LOGGER.error('failed to get repo from database with exception {e}'.format(e=e))
 
-        LOGGER.error('webhooks: {}'.format(webhooks))
+        LOGGER.error('webhooks: {}'.format(has_webhooks))
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
-            webhook = dict(id=repo.id) in webhooks
-            repos[full_name] = webhook
+            has_webhook = dict(id=repo.id) in has_webhooks
+            repos[full_name] = has_webhook
 
-        for full_name, webhook in repos.items():
+        for full_name, has_webhook in repos.items():
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
-                                                                                webhook=webhook))
+                                                                                webhook=has_webhook))
 
         form.webhooks.choices = [(full_name, full_name) for full_name, webhook in repos.items()]
 
@@ -228,8 +228,8 @@ if not DEBUG:
             LOGGER.error('webhook data: {}'.format(repr(form.webhooks.data)))
             add_webhooks = set()
             remove_webhooks = set()
-            for choice in form.webhooks.choices:
-                LOGGER.error('examining {}: {}'.format(choice))
+#            for choice in form.webhooks.choices:
+#                LOGGER.error('examining {}: {}'.format(choice))
 #                result = repos[checkbox.label]
 #                if result is not None and result.webhook is not checkbox.checked:
 

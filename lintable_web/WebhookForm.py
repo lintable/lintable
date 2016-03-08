@@ -26,5 +26,5 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class WebhookForm(Form):
-    webhooks = MultiCheckboxField()
+    webhooks = MultiCheckboxField('webhooks', choices=[])
  #   submit = SubmitField()
