@@ -215,8 +215,24 @@ if not DEBUG:
         for full_name, webhook in repos.items():
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=webhook))
+        if request.method == 'POST' and form.validate():
+            LOGGER.error('checking for updates')
+            add_webhooks = set()
+            remove_webhooks = set()
+            for checkbox in form.webhooks:
+                LOGGER.error('examining {}: {}'.format(checkbox.label, checkbox.checked))
+                result = repos[checkbox.label]
+                if result is not None and result.webhook is not checkbox.checked:
+                    if result.webhook:
+                        add_webhooks.add(checkbox.label)
+                    else:
+                        remove_webhooks.add(checkbox.label)
 
-        form.webhooks.choices = [(full_name, full_name) for full_name, webhook in repos.items()]
+            LOGGER.error('webhooks to add: {}'.format(add_webhooks))
+            LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
+
+        else:
+            form.webhooks.choices = [(full_name, full_name) for full_name, webhook in repos.items()]
 
         try:
             result = render_template('list_repos.html', current_user=current_user, form=form)
