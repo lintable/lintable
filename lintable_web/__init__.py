@@ -184,6 +184,7 @@ if not DEBUG:
     def list_repos():
         """List repositories for a given owner."""
         LOGGER.error('request: {}'.format(repr(request)))
+        LOGGER.error('form: {}'.format(repr(request.form)))
         github_id = current_user.github_id
         LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
 
