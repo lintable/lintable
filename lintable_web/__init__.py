@@ -220,7 +220,7 @@ if not DEBUG:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=has_webhook))
 
-        form.webhooks.choices = [(full_name, full_name) for full_name, webhook in repos.items()]
+        form.webhooks.choices = [(has_webhook, full_name) for full_name, has_webhook in repos.items()]
 
         if request.method == 'POST' and form.validate():
             LOGGER.error('checking for updates')
