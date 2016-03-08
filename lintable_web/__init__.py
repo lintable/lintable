@@ -182,8 +182,9 @@ if not DEBUG:
     @login_required
     def list_repos():
         """List repositories for a given owner."""
-        LOGGER.error('current_user: {}', current_user.id)
-        oauth_key = DatabaseHandler.get_user(current_user.id).get_oauth_token()
+        LOGGER.error('current_user: {}'.format(current_user.github_id))
+        oauth_key = DatabaseHandler.get_user(
+            current_user.github_id).get_oauth_token()
         client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
 
         client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
@@ -193,12 +194,12 @@ if not DEBUG:
                             client_secret=client_secret)
 
         repos = []
-
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
             webhook = DatabaseHandler.get_repo(repo.id)
             repos.append(dict(full_name=full_name, webhook=webhook))
-            LOGGER.error('repo full_name: {full_name}\twebhook?: {webhook}', full_name=full_name, webhook=webhook)
+            LOGGER.error('repo full_name: {name}\twebhook?: {hook}'.format(
+                name=full_name, hook=webhook))
 
         return '<html/>'
 
