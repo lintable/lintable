@@ -184,7 +184,7 @@ if not DEBUG:
     def list_repos():
         """List repositories for a given owner."""
         LOGGER.error('request: {}'.format(repr(request)))
-        LOGGER.error('form: {}'.format(repr(request.form)))
+
         github_id = current_user.github_id
         LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
 
@@ -218,7 +218,8 @@ if not DEBUG:
                                                                                 webhook=webhook))
         if request.method == 'POST' and form.validate():
             LOGGER.error('checking for updates')
-            LOGGER.error('choices: {}'.format(form.webhooks.data))
+            LOGGER.error('webhooks: {}'.format(repr(request.form.webhooks)))
+            LOGGER.error('webhook data: {}'.format(form.webhooks.data))
             add_webhooks = set()
             remove_webhooks = set()
             for choice in form.webhooks.choices:
