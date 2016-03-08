@@ -218,8 +218,8 @@ if not DEBUG:
                                                                                 webhook=webhook))
         if request.method == 'POST' and form.validate():
             LOGGER.error('checking for updates')
-            LOGGER.error('webhooks: {}'.format(repr(request.form.webhooks)))
-            LOGGER.error('webhook data: {}'.format(repr(request.form.webhooks.data)))
+            LOGGER.error('webhooks: {}'.format(repr(form.webhooks)))
+            LOGGER.error('webhook data: {}'.format(repr(form.webhooks.data)))
             add_webhooks = set()
             remove_webhooks = set()
             for choice in form.webhooks.choices:
