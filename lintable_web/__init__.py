@@ -258,7 +258,7 @@ if not DEBUG:
 
         try:
             name = url_for('index', _external=True)
-            config = dict(url=url_for('payload', _external=True),
+            config = dict(url=url_for('github_payload', _external=True),
                           content_type='json',
                           secret='')
             events = ['pull_request']
