@@ -257,7 +257,7 @@ if not DEBUG:
     def add_webhook(github_api: Github, owner: User, full_names: Iterable[str]):
 
         try:
-            name = url_for('index', _external=True)
+            name = url_for('index', _external=True).split('//')[1].split('.')[0]
             config = dict(url=url_for('github_payload', _external=True),
                           content_type='json',
                           secret='')
