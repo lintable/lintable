@@ -257,7 +257,7 @@ if not DEBUG:
     def add_webhook(github_api: Github, owner: User, full_names: Iterable[str]):
 
         try:
-            name = url_for('/', _external=True)
+            name = url_for('index', _external=True)
             config = dict(url=url_for('payload', _external=True),
                           content_type='json',
                           secret='')
@@ -286,7 +286,7 @@ if not DEBUG:
         return
 
     def remove_webhook(github_api: Github, full_names: Iterable[str]):
-        payload_url = url_for('/', _external=True)
+        payload_url = url_for('payload', _external=True)
 
         for full_name in full_names:
             LOGGER.error('deleting webhook for repo {}'.format(full_name))
