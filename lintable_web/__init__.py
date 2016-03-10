@@ -270,15 +270,19 @@ if not DEBUG:
         for full_name in full_names:
             LOGGER.error('creating webhook for repo {}'.format(full_name))
 
-            github_repo = github_api.get_repo(full_name)
-            hook = github_repo.create_hook(name=name, config=config, events=events, active=active)
+            try:
+                github_repo = github_api.get_repo(full_name)
+                LOGGER.error('webhook addition: repo = {}'.format(github_repo))
 
-            LOGGER.error('webhook addition: repo = {}'.format(github_repo))
-            LOGGER.error('webhook addition: hook = {}'.format(hook))
+                hook = github_repo.create_hook(name=name, config=config, events=events, active=active)
+                LOGGER.error('webhook addition: hook = {}'.format(hook))
+            except Exception as e:
+                LOGGER.error('repo look/webhook creation failed with {}'.format(e))
+                continue
 
             if hook:
                 try:
-                    repo = Repo.create_or_get(repo_id=github_repo.id, owner_id=owner)
+                    repo = Repo.create_or_get(repo_id=github_repo.id, owner=owner, url=github_repo.url)
                     repo.save()
                 except Exception as e:
                     LOGGER.error('failed to save repo record with exception: {}'.format(e))
