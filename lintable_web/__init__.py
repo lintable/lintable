@@ -17,6 +17,7 @@
 import json
 import logging
 import urllib.parse
+from typing import Iterable
 
 import github
 import requests
@@ -187,7 +188,8 @@ if not DEBUG:
         github_id = current_user.github_id
         LOGGER.error('current_user: {github_id}'.format(github_id=github_id))
 
-        oauth_key = DatabaseHandler.get_user(current_user.github_id).get_oauth_token()
+        owner = DatabaseHandler.get_user(current_user.github_id)
+        oauth_key = owner.get_oauth_token()
         client_id = LINTWEB_SETTINGS['github']['CLIENT_ID']
 
         client_secret = LINTWEB_SETTINGS['github']['CLIENT_SECRET']
@@ -226,20 +228,20 @@ if not DEBUG:
             LOGGER.error('checking for updates')
             LOGGER.error('webhooks: {}'.format(repr(form.webhooks)))
             LOGGER.error('webhook data: {}'.format(repr(form.webhooks.data)))
+            change_webhooks = form.webhooks.data if form.webhooks.data else []
             add_webhooks = set()
             remove_webhooks = set()
-#            for choice in form.webhooks.choices:
-#                LOGGER.error('examining {}: {}'.format(choice))
-#                result = repos[checkbox.label]
-#                if result is not None and result.webhook is not checkbox.checked:
 
-#                   if result.webhook:
-#                        add_webhooks.add(checkbox.label)
-#                    else:
-#                        remove_webhooks.add(checkbox.label)
+            for full_name, has_webhook in repos.items():
+                if full_name in change_webhooks and not has_webhook:
+                    add_webhooks.add(full_name)
+                if full_name not in change_webhooks and has_webhook:
+                    remove_webhooks.add(full_name)
 
             LOGGER.error('webhooks to add: {}'.format(add_webhooks))
             LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
+            add_webhook(github_api, owner, add_webhooks)
+            remove_webhook(github_api, owner, remove_webhooks)
         else:
             LOGGER.error('presenting form')
 
@@ -252,6 +254,55 @@ if not DEBUG:
 
         return result
 
+    def add_webhook(github_api: Github, owner: User, full_names: Iterable[str]):
+
+        name = url_for('/', _external=True)
+        config = dict(url=url_for('payload', _external=True),
+                      content_type='json',
+                      secret='')
+        events = ['pull_request']
+        active = True
+
+        for full_name in full_names:
+            LOGGER.error('creating webhook for repo {}'.format(full_name))
+
+            github_repo = github_api.get_repo(full_name)
+            hook = github_repo.create_hook(name=name, config=config, events=events, active=active)
+
+            LOGGER.error('webhook additon: repo = {}'.format(github_repo))
+            LOGGER.error('webhook addition: hook = {}'.format(hook))
+
+            if hook:
+                try:
+                    repo = Repo.create_or_get(repo_id=github_repo.id, owner_id=owner)
+                    repo.save()
+                except Exception as e:
+                    LOGGER.error('failed to save repo record with exception: {}'.format(e))
+
+        return
+
+    def remove_webhook(github_api: Github, full_names: Iterable[str]):
+        payload_url = url_for('/', _external=True)
+
+        for full_name in full_names:
+            LOGGER.error('deleting webhook for repo {}'.format(full_name))
+
+            github_repo = github_api.get_repo(full_name)
+
+            LOGGER.error('webhook deletion: repo = {}'.format(github_repo))
+
+            for hook in github_repo.get_hooks():
+                if hook.url == payload_url:
+                    LOGGER.error('webhook deletion: hook = {}'.format(hook))
+                    hook.delete()
+
+                    try:
+                        repo = DatabaseHandler.get_repo(github_repo.id)
+                        repo.delete()
+                    except Exception as e:
+                        LOGGER.error('failed to delete repo record with exception: {}'.format(e))
+
+        return
 
     @app.route('/logout')
     @login_required
