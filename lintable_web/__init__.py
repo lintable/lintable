@@ -280,7 +280,7 @@ if not DEBUG:
                 LOGGER.error('repo look/webhook creation failed with {}'.format(e))
                 continue
 
-            if hook:
+            if hook is not None:
                 try:
                     repo = Repo.create_or_get(repo_id=github_repo.id, owner=owner, url=github_repo.url)
                     repo.save()
