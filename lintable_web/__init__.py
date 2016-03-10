@@ -228,7 +228,7 @@ if not DEBUG:
             LOGGER.error('checking for updates')
             LOGGER.error('webhooks: {}'.format(repr(form.webhooks)))
             LOGGER.error('webhook data: {}'.format(repr(form.webhooks.data)))
-            change_webhooks = form.webhooks.data if form.webhooks.data else []
+            change_webhooks = form.webhooks.data if form.webhooks and form.webhooks.data else []
             add_webhooks = set()
             remove_webhooks = set()
 
@@ -241,7 +241,7 @@ if not DEBUG:
             LOGGER.error('webhooks to add: {}'.format(add_webhooks))
             LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
             add_webhook(github_api, owner, add_webhooks)
-            remove_webhook(github_api, owner, remove_webhooks)
+            remove_webhook(github_api, remove_webhooks)
         else:
             LOGGER.error('presenting form')
 
@@ -256,12 +256,16 @@ if not DEBUG:
 
     def add_webhook(github_api: Github, owner: User, full_names: Iterable[str]):
 
-        name = url_for('/', _external=True)
-        config = dict(url=url_for('payload', _external=True),
-                      content_type='json',
-                      secret='')
-        events = ['pull_request']
-        active = True
+        try:
+            name = url_for('/', _external=True)
+            config = dict(url=url_for('payload', _external=True),
+                          content_type='json',
+                          secret='')
+            events = ['pull_request']
+            active = True
+        except Exception as e:
+            LOGGER.error('exception while creating data for webhook creation: {}'.format(e))
+            return
 
         for full_name in full_names:
             LOGGER.error('creating webhook for repo {}'.format(full_name))
@@ -269,7 +273,7 @@ if not DEBUG:
             github_repo = github_api.get_repo(full_name)
             hook = github_repo.create_hook(name=name, config=config, events=events, active=active)
 
-            LOGGER.error('webhook additon: repo = {}'.format(github_repo))
+            LOGGER.error('webhook addition: repo = {}'.format(github_repo))
             LOGGER.error('webhook addition: hook = {}'.format(hook))
 
             if hook:
