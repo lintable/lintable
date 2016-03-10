@@ -19,7 +19,6 @@ import logging
 import urllib.parse
 from typing import Iterable
 
-import github
 import requests
 from flask import (Flask, request, render_template, redirect, url_for,
                    abort, flash)
@@ -282,7 +281,7 @@ if not DEBUG:
 
             if hook is not None:
                 try:
-                    repo = Repo.create_or_get(repo_id=github_repo.id, owner=owner, url=github_repo.url)
+                    repo = Repo(repo_id=github_repo.id, owner=owner, url=github_repo.url)
                     repo.save()
                 except Exception as e:
                     LOGGER.error('failed to save repo record with exception: {}'.format(e))
