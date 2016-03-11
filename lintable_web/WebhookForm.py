@@ -26,11 +26,11 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class RepoForm(Form):
-    repo_full_name = Label('repo_full_name', text='')
+    repo_full_name = Label(field_id='repo_full_name', text='')
     change_webhook = SubmitField('change_webhook')
 
 
 class WebhookForm(Form):
-    webhooks = FieldList(FormField(RepoForm), min_entries=0, max_entries=None)
+    webhooks = FieldList(FormField(RepoForm))
     #    webhooks = MultiCheckboxField('webhooks', choices=[])
     #   submit = SubmitField()
