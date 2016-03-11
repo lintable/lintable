@@ -24,9 +24,18 @@ limitations under the License.
 {% block content %}
 
     <form method=post action="/list/repositories">
-
-        {{ render_field(form.webhooks) }}
-
+        <table>
+            <tr>
+                <th> Repository</th>
+                <th> Add/Remove Webhook</th>
+            </tr>
+            {% for repo in form.webhooks %}
+                <tr>
+                    <td>{{ repo.full_name }}</td>
+                    <td>{{ repo.change_webhook }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </form>
 
 {% endblock %}
