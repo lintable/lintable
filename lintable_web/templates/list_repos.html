@@ -31,7 +31,7 @@ limitations under the License.
             </tr>
             {% for repo in form.webhooks %}
                 <tr>
-                    <td>{{ repo.full_name }}</td>
+                    <td>{{ repo.repo_full_name }}</td>
                     <td>{{ repo.change_webhook }}</td>
                 </tr>
             {% endfor %}
