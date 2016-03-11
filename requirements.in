@@ -9,7 +9,7 @@
 # You can use pip-sync to remove any unneeded packages after cleaning up the requirements.in
 Flask==0.10.1
 Gunicorn==19.4.1
-Celery==3.1.19
+Celery==3.1.23
 Redis==2.10.5
 GitPython==1.0.1
 peewee==2.8.0
@@ -21,3 +21,5 @@ click==6.2
 rstr==2.2.3
 flask-login==0.3.2
 cryptography==1.2.2
+flask-socketio==2.2
+eventlet==0.18.4
