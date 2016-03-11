@@ -12,7 +12,6 @@ cffi==1.5.2               # via cryptography
 click==6.2
 cryptography==1.2.2
 flask-login==0.3.2
-flask-wtf==0.12
 Flask==0.10.1
 gitdb==0.6.4              # via gitpython
 GitPython==1.0.1
@@ -36,7 +35,6 @@ simple-crypt==4.1.7
 six==1.10.0               # via cryptography
 smmap==0.9.0              # via gitdb
 Werkzeug==0.11.4
-WTForms==2.1
 
 # The following packages are commented out because they are
 # considered to be unsafe in a requirements file:

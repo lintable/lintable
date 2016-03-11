@@ -25,13 +25,11 @@ from flask import (Flask, request, render_template, redirect, url_for,
 from flask_login import (LoginManager, login_user, login_required, logout_user,
                          current_user)
 from github import Github
-from werkzeug.datastructures import MultiDict
 
 from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, database, Repo
 from lintable_settings.settings import LINTWEB_SETTINGS
 from lintable_lintball import lintball
-from lintable_web.WebhookForm import WebhookForm, RepoForm
 
 app = Flask(__name__)  # pylint: disable=invalid-name
 app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']

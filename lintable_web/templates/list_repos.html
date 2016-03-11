@@ -16,8 +16,6 @@ limitations under the License.
 
 {% extends "_wrapper.html" %}
 
-{% from "_formhelpers.html" import render_field %}
-
 {% block headtitle %}Lintable | Repositories{% endblock %}
 {% block pagetitle %}Account: {{ current_user.username }}{% endblock %}
 
@@ -33,9 +31,9 @@ limitations under the License.
         {% for full_name, change_webhook in repos %}
             <tr>
                 <td>{{ full_name }}</td>
-                <td><p class="lead"><a class="btn btn-primary btn-lg"
+                <td><a class="btn btn-primary btn-lg"
                                        id={{ full_name + "_change_webhook" }} href="/register"
-                                       role="button">{{ change_webhook }}</a></p></td>
+                                       role="button">{{ change_webhook }}</a></td>
             </tr>
         {% endfor %}
 
