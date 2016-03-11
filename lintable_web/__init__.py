@@ -219,7 +219,7 @@ if not DEBUG:
             repos[full_name] = has_webhook
             try:
                 repo_form = RepoForm()
-                repo_form.repo_full_name.data = full_name
+                repo_form.change_webhook.label = full_name
                 repo_form.change_webhook.data = 'Remove' if has_webhook else 'Add'
                 webhook_form.webhooks.append_entry(repo_form)
             except Exception as e:

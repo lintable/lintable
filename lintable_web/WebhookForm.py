@@ -27,7 +27,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class RepoForm(Form):
-    repo_full_name = StringField()
+    #    repo_full_name = StringField()
     change_webhook = SubmitField()
 
 
