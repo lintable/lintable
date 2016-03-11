@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from wtforms import Form, widgets, SelectMultipleField, SubmitField, Field, Label, FormField, FieldList
+from wtforms import Form, widgets, SelectMultipleField, SubmitField, Field, Label, FormField, FieldList, StringField
+from wtforms.validators import DataRequired
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -26,7 +27,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class RepoForm(Form):
-    repo_full_name = Label(field_id='repo_full_name', text='')
+    repo_full_name = StringField('repo_full_name', validators=DataRequired)
     change_webhook = SubmitField('change_webhook')
 
 

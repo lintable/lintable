@@ -218,9 +218,9 @@ if not DEBUG:
             has_webhook = dict(id=repo.id) in has_webhooks
             repos[full_name] = has_webhook
             try:
-                repo_form_data = MultiDict([('repo_full_name', full_name),
-                                            ('change_webhook', 'Remove' if has_webhook else 'Add')])
-                repo_form = RepoForm(repo_form_data)
+                repo_form = RepoForm()
+                repo_form.repo_full_name.data = full_name
+                repo_form.change_webhook.data = 'Remove' if has_webhook else 'Add'
                 webhook_form.webhooks.append_entry(repo_form)
             except Exception as e:
                 LOGGER.error('unable to fill repo_form, exception thrown: {}'.format(e))
