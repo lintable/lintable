@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from wtforms import Form, widgets, SelectMultipleField, SubmitField
+from wtforms import Form, widgets, SelectMultipleField, SubmitField, Field, Label, FormField, FieldList
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -25,6 +25,12 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 
+class RepoForm(Form):
+    repo_full_name = Label('repo_full_name', text='')
+    change_webhook = SubmitField('change_webhook')
+
+
 class WebhookForm(Form):
-    webhooks = MultiCheckboxField('webhooks', choices=[])
- #   submit = SubmitField()
+    webhooks = FieldList(FormField(RepoForm), min_entries=0, max_entries=None)
+    #    webhooks = MultiCheckboxField('webhooks', choices=[])
+    #   submit = SubmitField()

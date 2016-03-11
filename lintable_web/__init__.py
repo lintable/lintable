@@ -30,7 +30,7 @@ from lintable_db.database import DatabaseHandler
 from lintable_db.models import User, database, Repo
 from lintable_settings.settings import LINTWEB_SETTINGS
 from lintable_lintball import lintball
-from lintable_web.WebhookForm import WebhookForm
+from lintable_web.WebhookForm import WebhookForm, RepoForm
 
 app = Flask(__name__)  # pylint: disable=invalid-name
 app.secret_key = LINTWEB_SETTINGS['SESSIONS_SECRET']
@@ -198,9 +198,9 @@ if not DEBUG:
                             client_secret=client_secret)
 
         if request.method == 'GET':
-            form = WebhookForm()
+            webhook_form = WebhookForm()
         else:
-            form = WebhookForm(request.form)
+            webhook_form = WebhookForm(request.form)
 
         repos = {}
 
@@ -216,18 +216,25 @@ if not DEBUG:
             full_name = repo.full_name
             has_webhook = dict(id=repo.id) in has_webhooks
             repos[full_name] = has_webhook
+            try:
+                repo_form = RepoForm()
+                repo_form.repo_full_name.text = full_name
+                repo_form.change_webhook.label = 'Remove' if has_webhook else 'Add'
+                webhook_form.webhooks.append_entry(repo_form)
+            except Exception as e:
+                LOGGER.error('unable to fill repo_form, exception thrown: {}'.format(e))
 
         for full_name, has_webhook in repos.items():
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=has_webhook))
 
-        form.webhooks.choices = [(full_name, full_name) for full_name, has_webhook in repos.items()]
+#        webhook_form.webhooks.choices = [(full_name, full_name) for full_name, has_webhook in repos.items()]
 
-        if request.method == 'POST' and form.validate():
+        if request.method == 'POST' and webhook_form.validate():
             LOGGER.error('checking for updates')
-            LOGGER.error('webhooks: {}'.format(repr(form.webhooks)))
-            LOGGER.error('webhook data: {}'.format(repr(form.webhooks.data)))
-            change_webhooks = form.webhooks.data if form.webhooks and form.webhooks.data else []
+            LOGGER.error('webhooks: {}'.format(repr(webhook_form.webhooks)))
+            LOGGER.error('webhook data: {}'.format(repr(webhook_form.webhooks.data)))
+            change_webhooks = webhook_form.webhooks.data if webhook_form.webhooks and webhook_form.webhooks.data else []
             add_webhooks = set()
             remove_webhooks = set()
 
@@ -242,11 +249,11 @@ if not DEBUG:
             add_webhook(github_api, owner, add_webhooks)
             remove_webhook(github_api, remove_webhooks)
         else:
-            LOGGER.error('presenting form')
+            LOGGER.error('presenting webhook_form')
 
 
         try:
-            result = render_template('list_repos.html', current_user=current_user, form=form)
+            result = render_template('list_repos.html', current_user=current_user, form=webhook_form)
         except Exception as e:
             result = ''
             LOGGER.error('failed to render html with {e}'.format(e=e))
