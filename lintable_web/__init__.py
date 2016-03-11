@@ -216,7 +216,7 @@ if not DEBUG:
         LOGGER.error('repos: {}'.format(repos))
 
         try:
-            for full_name, has_webhook in repos:
+            for full_name, has_webhook in repos.items():
                 LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                     webhook=has_webhook))
 
