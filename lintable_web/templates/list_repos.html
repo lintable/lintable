@@ -23,23 +23,22 @@ limitations under the License.
 
 {% block content %}
 
-    {% for full_name, change_webhoo in repos %}
+    <table>
 
-        <table>
-            <thead>
-            <tr>Repository</tr>
-            <tr>Add or Remove Webhook</tr>
-            </thead>
-            <tbody>
+        <tr>
+            <th>Repository</th>
+            <th>Add or Remove Webhook</th>
+        </tr>
+
+        {% for full_name, change_webhook in repos %}
             <tr>
                 <td>{{ full_name }}</td>
-                <td><p class="lead"><a class="btn btn-primary btn-lg" id={{ full_name + "_change_webhook" }} href="/register"
+                <td><p class="lead"><a class="btn btn-primary btn-lg"
+                                       id={{ full_name + "_change_webhook" }} href="/register"
                                        role="button">{{ change_webhook }}</a></p></td>
             </tr>
-            </tbody>
-        </table>
+        {% endfor %}
 
-
-    {% endfor %}
+    </table>
 
 {% endblock %}
