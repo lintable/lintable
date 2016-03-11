@@ -213,6 +213,8 @@ if not DEBUG:
             has_webhook = 'Remove' if dict(id=repo.id) in has_webhooks else 'Add'
             repos[full_name] = has_webhook
 
+        LOGGER.error('repos: {}'.format(repos))
+
         for full_name, has_webhook in repos:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=has_webhook))
