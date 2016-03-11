@@ -23,10 +23,23 @@ limitations under the License.
 
 {% block content %}
 
-    <form method=post action="/list/repositories">
-            {% for repo in form.webhooks %}
-                    <p>{{ repo.change_webhook }}</p>
-            {% endfor %}
-    </form>
+    {% for full_name, change_webhoo in repos %}
+
+        <table>
+            <thead>
+            <tr>Repository</tr>
+            <tr>Add or Remove Webhook</tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{ full_name }}</td>
+                <td><p class="lead"><a class="btn btn-primary btn-lg" id={{ full_name + "_change_webhook" }} href="/register"
+                                       role="button">{{ change_webhook }}</a></p></td>
+            </tr>
+            </tbody>
+        </table>
+
+
+    {% endfor %}
 
 {% endblock %}

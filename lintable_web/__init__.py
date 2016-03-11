@@ -198,11 +198,6 @@ if not DEBUG:
                             client_id=client_id,
                             client_secret=client_secret)
 
-        if request.method == 'GET':
-            webhook_form = WebhookForm()
-        else:
-            webhook_form = WebhookForm(request.form)
-
         repos = {}
 
         try:
@@ -215,46 +210,15 @@ if not DEBUG:
 
         for repo in github_api.get_user().get_repos(type='owner'):
             full_name = repo.full_name
-            has_webhook = dict(id=repo.id) in has_webhooks
+            has_webhook = 'Remove' if dict(id=repo.id) in has_webhooks else 'Add'
             repos[full_name] = has_webhook
-            try:
-                repo_form = RepoForm()
-                repo_form.change_webhook.label = full_name
-                repo_form.change_webhook.data = 'Remove' if has_webhook else 'Add'
-                webhook_form.webhooks.append_entry(repo_form)
-            except Exception as e:
-                LOGGER.error('unable to fill repo_form, exception thrown: {}'.format(e))
 
-        for full_name, has_webhook in repos.items():
+        for full_name, has_webhook in repos:
             LOGGER.error('full_name: {full_name}\t\twebhook?: {webhook}'.format(full_name=full_name,
                                                                                 webhook=has_webhook))
 
-#        webhook_form.webhooks.choices = [(full_name, full_name) for full_name, has_webhook in repos.items()]
-
-        if request.method == 'POST' and webhook_form.validate():
-            LOGGER.error('checking for updates')
-            LOGGER.error('webhooks: {}'.format(repr(webhook_form.webhooks)))
-            LOGGER.error('webhook data: {}'.format(repr(webhook_form.webhooks.data)))
-            change_webhooks = webhook_form.webhooks.data if webhook_form.webhooks and webhook_form.webhooks.data else []
-            add_webhooks = set()
-            remove_webhooks = set()
-
-            for full_name, has_webhook in repos.items():
-                if full_name in change_webhooks and not has_webhook:
-                    add_webhooks.add(full_name)
-                if full_name not in change_webhooks and has_webhook:
-                    remove_webhooks.add(full_name)
-
-            LOGGER.error('webhooks to add: {}'.format(add_webhooks))
-            LOGGER.error('webhooks to remove: {}'.format(remove_webhooks))
-            add_webhook(github_api, owner, add_webhooks)
-            remove_webhook(github_api, remove_webhooks)
-        else:
-            LOGGER.error('presenting webhook_form')
-
-
         try:
-            result = render_template('list_repos.html', current_user=current_user, form=webhook_form)
+            result = render_template('list_repos.html', current_user=current_user, repos=repos)
         except Exception as e:
             result = ''
             LOGGER.error('failed to render html with {e}'.format(e=e))
