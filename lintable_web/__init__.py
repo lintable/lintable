@@ -218,8 +218,8 @@ if not DEBUG:
             repos[full_name] = has_webhook
             try:
                 repo_form = RepoForm()
-                repo_form.repo_full_name.text = full_name
-                repo_form.change_webhook.label = 'Remove' if has_webhook else 'Add'
+                repo_form.repo_full_name = full_name
+                repo_form.change_webhook = 'Remove' if has_webhook else 'Add'
                 webhook_form.webhooks.append_entry(repo_form)
             except Exception as e:
                 LOGGER.error('unable to fill repo_form, exception thrown: {}'.format(e))
