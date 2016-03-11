@@ -27,7 +27,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class RepoForm(Form):
-    repo_full_name = StringField('repo_full_name', validators=DataRequired)
+    repo_full_name = StringField('repo_full_name', validators=[DataRequired()])
     change_webhook = SubmitField('change_webhook')
 
 
