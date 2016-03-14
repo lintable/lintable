@@ -46,3 +46,29 @@ pip install -r requirements.txt --allow-all-external
 
 * **Atom:** Install the [editorconfig package](https://atom.io/packages/editorconfig).
 * **PyCharm:** Agree to the notification that pops up about EditorConfig settings.
+
+## Adding a webhook to a GitHub repository
+
+Here are step by step instructions for adding a webhook to your GitHub repository. Once the webhook is established, [lintable.com](http://lintable.com/) will automatically run on a new pull request.
+
+**Step 1**
+Go to the Settings page of your repository, and click on Webhooks & services. After that, click on Add webhook.
+
+![Webhook1.png](screenshots/Webhook1.png)
+
+**Step 2**
+Enter the correct server endpoint for [lintable.com](http://lintable.com/) in the "Payload URL" field. Leave the default "Content type" as "application/json" and the "Secret" blank.
+
+![Webhook2.png](screenshots/Webhook2.png)
+
+**Step 3**
+On the events dialog box, select "Let me select individual events" and then select "Pull Requests" as the only event for the webhook. Check "Active" and then click on the **Add Webhook** button to create the webhook.
+
+![Webhook3.png](screenshots/Webhook3.png)
+
+**Step 4**
+The settings page should now display and active webhook for [lintable.com](http://lintable.com/).
+
+![Webhook4.png](screenshots/Webhook4.png)
+
+For more information on webhooks, see the [GitHub documentation](https://developer.github.com/webhooks/).
