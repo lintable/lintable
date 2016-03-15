@@ -22,4 +22,4 @@ rstr==2.2.3
 flask-login==0.3.2
 cryptography==1.2.2
 flask-socketio==2.2
-eventlet==0.18.4
+gevent-websocket==0.9.5

@@ -11,14 +11,15 @@ Celery==3.1.23
 cffi==1.5.2               # via cryptography
 click==6.2
 cryptography==1.2.2
-eventlet==0.18.4
 flask-login==0.3.2
 flask-socketio==2.2
 Flask==0.10.1
+gevent-websocket==0.9.5
+gevent==1.1.0             # via gevent-websocket
 gitdb==0.6.4              # via gitpython
 GitPython==1.0.1
-greenlet==0.4.9           # via eventlet
-Gunicorn==19.4.1
+greenlet==0.4.9           # via gevent
+Gunicorn==19.4.5
 idna==2.0                 # via cryptography
 itsdangerous==0.24        # via flask
 Jinja2==2.8
@@ -32,7 +33,7 @@ pycrypto==2.6.1           # via simple-crypt
 PyGithub==1.26.0
 python-engineio==0.9.0    # via flask-socketio, python-socketio
 python-socketio==1.1      # via flask-socketio
-pytz==2015.7              # via celery
+pytz==2016.1              # via celery
 Redis==2.10.5
 Requests==2.9.1
 rstr==2.2.3
